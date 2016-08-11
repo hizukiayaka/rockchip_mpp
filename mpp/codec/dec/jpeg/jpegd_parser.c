@@ -1269,7 +1269,7 @@ MPP_RET jpegd_read_decode_parameters(JpegParserContext *ctx, StreamStorage *pStr
     }
 
     JpegParserContext *pCtx = ctx;
-    JpegDecImageInfo *pImageInfo = (JpegDecImageInfo *) & (pCtx->imageInfo);
+    JpegDecImageInfo *pImageInfo = (JpegDecImageInfo *) & (pCtx->pSyntax->imageInfo);
     JpegSyntaxParam *pSyntax = pCtx->pSyntax;
     RK_U32 Nf = 0, Ns = 0, NsThumb = 0;
     RK_U32 i, j = 0, init = 0, initThumb = 0;
@@ -1394,11 +1394,11 @@ MPP_RET jpegd_read_decode_parameters(JpegParserContext *ctx, StreamStorage *pStr
                 /* check format */
                 if (H[0] == 2 && V[0] == 2 &&
                     H[1] == 1 && V[1] == 1 && H[2] == 1 && V[2] == 1) {
-                    pImageInfo->outputFormat = JPEGDEC_YCbCr420_SEMIPLANAR;
+                    pImageInfo->outputFormat = MPP_FMT_YUV420SP;
                     pSyntax->frame.numMcuInRow = (pSyntax->frame.hwX / 16);
                     pSyntax->frame.numMcuInFrame = ((pSyntax->frame.hwX * pSyntax->frame.hwY) / 256);
                 } else if (H[0] == 2 && V[0] == 1 && H[1] == 1 && V[1] == 1 && H[2] == 1 && V[2] == 1) {
-                    pImageInfo->outputFormat = JPEGDEC_YCbCr422_SEMIPLANAR;
+                    pImageInfo->outputFormat = MPP_FMT_YUV422SP;
                     pSyntax->frame.numMcuInRow = (pSyntax->frame.hwX / 16);
                     pSyntax->frame.numMcuInFrame = ((pSyntax->frame.hwX * pSyntax->frame.hwY) / 128);
                 } else if (H[0] == 1 && V[0] == 2 &&
@@ -1449,7 +1449,7 @@ MPP_RET jpegd_read_decode_parameters(JpegParserContext *ctx, StreamStorage *pStr
                 JPEGD_VERBOSE_LOG("SOS, currentByte:0x%x", currentByte);
                 /* SOS length */
                 headerLength = jpegd_get_two_bytes(pStream);
-                JPEGD_VERBOSE_LOG("SOS, headerLength:%d", headerLength);
+                JPEGD_VERBOSE_LOG("Length of <Start of Scan> is %d", headerLength);
                 if (headerLength == STRM_ERROR ||
                     ((pStream->readBits + ((headerLength * 8) - 16)) > (8 * pStream->streamLength))) {
                     JPEGD_ERROR_LOG("readBits:%d, headerLength:%d, streamLength:%d", pStream->readBits, headerLength, pStream->streamLength);
@@ -1483,7 +1483,7 @@ MPP_RET jpegd_read_decode_parameters(JpegParserContext *ctx, StreamStorage *pStr
                 JPEGD_VERBOSE_LOG("DQT, currentByte:0x%x", currentByte);
                 /* DQT length */
                 headerLength = jpegd_get_two_bytes(pStream);
-                JPEGD_VERBOSE_LOG("headerLength:%d", headerLength);
+                JPEGD_VERBOSE_LOG("Length of Define Quantization Table is %d", headerLength);
                 if (headerLength == STRM_ERROR ||
                     ((pStream->readBits + ((headerLength * 8) - 16)) > (8 * pStream->streamLength))) {
                     JPEGD_ERROR_LOG("readBits:%d, headerLength:%d, streamLength:%d", pStream->readBits, headerLength, pStream->streamLength);
@@ -1502,7 +1502,7 @@ MPP_RET jpegd_read_decode_parameters(JpegParserContext *ctx, StreamStorage *pStr
                 JPEGD_VERBOSE_LOG("DHT, currentByte:0x%x", currentByte);
                 /* DHT length */
                 headerLength = jpegd_get_two_bytes(pStream);
-                JPEGD_VERBOSE_LOG("headerLength:%d", headerLength);
+                JPEGD_VERBOSE_LOG("Length of Define Huffman Table is %d", headerLength);
                 if (headerLength == STRM_ERROR ||
                     ((pStream->readBits + ((headerLength * 8) - 16)) > (8 * pStream->streamLength))) {
                     JPEGD_ERROR_LOG("readBits:%d, headerLength:%d, streamLength:%d", pStream->readBits, headerLength, pStream->streamLength);
@@ -1520,22 +1520,16 @@ MPP_RET jpegd_read_decode_parameters(JpegParserContext *ctx, StreamStorage *pStr
                 JPEGD_VERBOSE_LOG("DRI, currentByte:0x%x", currentByte);
                 /* DRI length */
                 headerLength = jpegd_get_two_bytes(pStream);
-                JPEGD_VERBOSE_LOG("headerLength:%d", headerLength);
+                JPEGD_VERBOSE_LOG("Length of Define Restart Interval(must be 4 Bytes) is %d", headerLength);
                 if (headerLength == STRM_ERROR ||
                     ((pStream->readBits + ((headerLength * 8) - 16)) > (8 * pStream->streamLength))) {
                     JPEGD_ERROR_LOG("readBits:%d, headerLength:%d, streamLength:%d", pStream->readBits, headerLength, pStream->streamLength);
                     errorCode = 1;
                     break;
                 }
-#if 0
-                /* jump over DRI header */
-                if (headerLength != 0) {
-                    pStream->readBits += ((headerLength * 8) - 16);
-                    pStream->pCurrPos += (((headerLength * 8) - 16) / 8);
-                }
-#endif
+
                 headerLength = jpegd_get_two_bytes(pStream);
-                JPEGD_VERBOSE_LOG("headerLength:%d", headerLength);
+                JPEGD_VERBOSE_LOG("Restart Interval:%d", headerLength);
                 if (headerLength == STRM_ERROR ||
                     ((pStream->readBits + ((headerLength * 8) - 16)) > (8 * pStream->streamLength))) {
                     JPEGD_ERROR_LOG("readBits:%d, headerLength:%d, streamLength:%d", pStream->readBits, headerLength, pStream->streamLength);
@@ -1739,10 +1733,10 @@ MPP_RET jpegd_read_decode_parameters(JpegParserContext *ctx, StreamStorage *pStr
                                     /* check format */
                                     if (Htn[0] == 2 && Vtn[0] == 2 &&
                                         Htn[1] == 1 && Vtn[1] == 1 && Htn[2] == 1 && Vtn[2] == 1) {
-                                        pImageInfo->outputFormatThumb = JPEGDEC_YCbCr420_SEMIPLANAR;
+                                        pImageInfo->outputFormatThumb = MPP_FMT_YUV420SP;
                                     } else if (Htn[0] == 2 && Vtn[0] == 1 &&
                                                Htn[1] == 1 && Vtn[1] == 1 && Htn[2] == 1 && Vtn[2] == 1) {
-                                        pImageInfo->outputFormatThumb = JPEGDEC_YCbCr422_SEMIPLANAR;
+                                        pImageInfo->outputFormatThumb = MPP_FMT_YUV422SP;
                                     } else if (Htn[0] == 1 && Vtn[0] == 2 &&
                                                Htn[1] == 1 && Vtn[1] == 1 && Htn[2] == 1 && Vtn[2] == 1) {
                                         pImageInfo->outputFormatThumb = JPEGDEC_YCbCr440;
@@ -2099,18 +2093,14 @@ MPP_RET jpegd_get_image_info(JpegParserContext *ctx)
 {
     FUN_TEST("Enter");
     JpegParserContext *pCtx = ctx;
-    MPP_RET ret = MPP_OK;
-    PostProcessInfo ppInfo;
-    RK_U32 ppInputFomart = 0;
-    RK_U32 ppScaleW = 640, ppScaleH = 480;
-    RK_U32 pic_size = 0;
-    StreamStorage stream;
-
     if (NULL == pCtx) {
         JPEGD_ERROR_LOG("NULL pointer");
         return MPP_ERR_NULL_PTR;
     }
+
+    MPP_RET ret = MPP_OK;
     JpegSyntaxParam *pSyntax = pCtx->pSyntax;
+    StreamStorage stream;
 
     if (pCtx->streamLength < 1) {
         JPEGD_ERROR_LOG("streamLength:%d", pCtx->streamLength);
@@ -2129,8 +2119,7 @@ MPP_RET jpegd_get_image_info(JpegParserContext *ctx)
         return MPP_ERR_VALUE;
     }
 
-    memset(&(pCtx->imageInfo), 0, sizeof(JpegDecImageInfo));
-    pCtx->imageInfo.thumbnailType = JPEGDEC_NO_THUMBNAIL;
+    pSyntax->imageInfo.thumbnailType = JPEGDEC_NO_THUMBNAIL;
 
     /* utils initialization */
     stream.bitPosInByte = 0;
@@ -2145,94 +2134,6 @@ MPP_RET jpegd_get_image_info(JpegParserContext *ctx)
         JPEGD_ERROR_LOG("read decode parameters failed, ret:%d", ret);
         return ret;
     }
-
-    if (pCtx->color_conv) {
-        /* Using pp to convert all format to yuv420sp */
-        switch (pCtx->imageInfo.outputFormat) {
-        case JPEGDEC_YCbCr400:
-            ppInputFomart = PP_IN_FORMAT_YUV400;
-            break;
-        case JPEGDEC_YCbCr420_SEMIPLANAR:
-            ppInputFomart = PP_IN_FORMAT_YUV420SEMI;
-            break;
-        case JPEGDEC_YCbCr422_SEMIPLANAR:
-            ppInputFomart = PP_IN_FORMAT_YUV422SEMI;
-            break;
-        case JPEGDEC_YCbCr440:
-            ppInputFomart = PP_IN_FORMAT_YUV440SEMI;
-            break;
-        case JPEGDEC_YCbCr411_SEMIPLANAR:
-            ppInputFomart = PP_IN_FORMAT_YUV411_SEMI;
-            break;
-        case JPEGDEC_YCbCr444_SEMIPLANAR:
-            ppInputFomart = PP_IN_FORMAT_YUV444_SEMI;
-            break;
-        }
-
-        // set pp info
-        memset(&ppInfo, 0, sizeof(ppInfo));
-        ppInfo.enable = 1;
-        ppInfo.outFomart = 5;   //PP_OUT_FORMAT_YUV420INTERLAVE
-        ppScaleW = pCtx->imageInfo.outputWidth;
-        ppScaleH = pCtx->imageInfo.outputHeight;
-        if (ppScaleW > 1920) { // || ppScaleH > 1920) {
-            ppScaleW = (ppScaleW + 15) & (~15); //(ppScaleW + 15)/16*16;
-            ppScaleH = (ppScaleH + 15) & (~15);
-        } else {
-            ppScaleW = (ppScaleW + 7) & (~7); // pp dest width must be dividable by 8
-            ppScaleH = (ppScaleH + 1) & (~1); // must be dividable by 2.in pp downscaling ,the output lines always equal (desire lines - 1);
-        }
-
-        JPEGD_INFO_LOG("Post Process! ppScaleW:%d, ppScaleH:%d", ppScaleW, ppScaleH);
-
-        pic_size = ppScaleW * ppScaleH * 2;
-        pSyntax->ppInstance = (void *)1;
-    } else {
-        /* keep original output format */
-        memset(&ppInfo, 0, sizeof(ppInfo));
-        ppInfo.outFomart = 5;   //PP_OUT_FORMAT_YUV420INTERLAVE
-        ppScaleW = pCtx->imageInfo.outputWidth;
-        ppScaleH = pCtx->imageInfo.outputHeight;
-
-        ppScaleW = (ppScaleW + 15) & (~15);
-        ppScaleH = (ppScaleH + 15) & (~15);
-
-        switch (pCtx->imageInfo.outputFormat) {
-        case JPEGDEC_YCbCr400:
-            ppInputFomart = PP_IN_FORMAT_YUV400;
-            pic_size = ppScaleW * ppScaleH;
-            break;
-        case JPEGDEC_YCbCr420_SEMIPLANAR:
-            ppInputFomart = PP_IN_FORMAT_YUV420SEMI;
-            pic_size = ppScaleW * ppScaleH * 3 / 2;
-            break;
-        case JPEGDEC_YCbCr422_SEMIPLANAR:
-            ppInputFomart = PP_IN_FORMAT_YUV422SEMI;
-            pic_size = ppScaleW * ppScaleH * 2;
-            break;
-        case JPEGDEC_YCbCr440:
-            ppInputFomart = PP_IN_FORMAT_YUV440SEMI;
-            pic_size = ppScaleW * ppScaleH * 2;
-            break;
-        case JPEGDEC_YCbCr411_SEMIPLANAR:
-            ppInputFomart = PP_IN_FORMAT_YUV411_SEMI;
-            pic_size = ppScaleW * ppScaleH * 2;
-            break;
-        case JPEGDEC_YCbCr444_SEMIPLANAR:
-            ppInputFomart = PP_IN_FORMAT_YUV444_SEMI;
-            pic_size = ppScaleW * ppScaleH * 3;
-            break;
-        }
-
-        pSyntax->ppInstance = (void *)0;
-    }
-
-    (void)pic_size;
-    memcpy(&(pSyntax->imageInfo), &(pCtx->imageInfo), sizeof(JpegDecImageInfo));
-    memcpy(&(pSyntax->ppInfo), &(ppInfo), sizeof(PostProcessInfo));
-    pSyntax->ppScaleW = ppScaleW;
-    pSyntax->ppScaleH = ppScaleH;
-    pSyntax->ppInputFomart = ppInputFomart;
 
     FUN_TEST("Exit");
     return ret;
@@ -2860,10 +2761,9 @@ MPP_RET jpegd_init(void *ctx, ParserCfg *parser_cfg)
     memset(JpegParserCtx->pSyntax, 0, sizeof(JpegSyntaxParam));
     JpegParserCtx->pSyntax->ppInstance = (void *)0; /* will be changed when need pp */
 
-    memset(&(JpegParserCtx->imageInfo), 0, sizeof(JpegDecImageInfo));
     JpegParserCtx->decImageType = JPEGDEC_IMAGE; /* FULL MODEs */
     JpegParserCtx->sliceMbSet = 0; /* will be changed when over 16MB*/
-    JpegParserCtx->color_conv = 1;
+    JpegParserCtx->color_conv = 0;
 
     /* max */
     JpegParserCtx->maxSupportedWidth = JPEGDEC_MAX_WIDTH_8190;
@@ -2910,11 +2810,23 @@ MPP_RET jpegd_reset(void *ctx)
 MPP_RET jpegd_control(void *ctx, RK_S32 cmd, void *param)
 {
     FUN_TEST("Enter");
-    (void)ctx;
-    (void)cmd;
-    (void)param;
+    MPP_RET ret = MPP_OK;
+    JpegParserContext *JpegParserCtx = (JpegParserContext *)ctx;
+    if (NULL == JpegParserCtx) {
+        JPEGD_ERROR_LOG("NULL pointer");
+        return MPP_ERR_NULL_PTR;
+    }
+
+    switch (cmd) {
+    case MPP_DEC_SET_OUTPUT_FORMAT: {
+        JpegParserCtx->color_conv = *((RK_U32 *)param);
+        JPEGD_INFO_LOG("output_format:%d\n", JpegParserCtx->color_conv);
+    } break;
+    default :
+        ret = MPP_NOK;
+    }
     FUN_TEST("Exit");
-    return MPP_OK;
+    return ret;
 }
 
 MPP_RET jpegd_callback(void *ctx, void *err_info)

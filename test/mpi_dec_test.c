@@ -116,7 +116,7 @@ int mpi_dec_test(MpiDecTestCmd *cmd)
         goto MPP_TEST_OUT;
     }
 
-    mpp_log("mpi_dec_test decoder test start w %d h %d type %d\n", width, height, type);
+    mpp_log("mpi_dec_test decoder test start w %d h %d type %d packate size %d\n", width, height, type, packet_size);
 
     // decoder demo
     get_mpi_debug();

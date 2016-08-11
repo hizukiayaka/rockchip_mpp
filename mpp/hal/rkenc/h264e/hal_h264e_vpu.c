@@ -1476,13 +1476,13 @@ static MPP_RET hal_h264e_vpu_write_pps(h264e_hal_vpu_stream *stream, h264e_hal_p
 
 static void hal_h264e_vpu_set_sps(h264e_hal_sps *sps, h264e_control_extra_info_cfg *cfg)
 {
-    sps->i_profile_idc = 66;   /* 66 = baseline, 77 = main, 100 = high */
+    sps->i_profile_idc = cfg->profile_idc;   /* 66 = baseline, 77 = main, 100 = high */
     sps->b_constraint_set0 = 1;
     sps->b_constraint_set1 = 1;
     sps->b_constraint_set2 = 1;
     sps->b_constraint_set3 = 0;
 
-    sps->i_level_idc = 40;
+    sps->i_level_idc = cfg->level_idc;
     sps->i_id = 0;
     sps->i_log2_max_frame_num = 16;
     sps->i_poc_type = 2;
@@ -1553,13 +1553,13 @@ static void hal_h264e_vpu_set_pps(h264e_hal_pps *pps, h264e_control_extra_info_c
     pps->i_num_ref_idx_l1_default_active = 1;
     pps->b_weighted_pred = 0;
     pps->i_weighted_bipred_idc = 0;
-    pps->i_pic_init_qp = 26;
-    pps->i_pic_init_qs = 26;
-    pps->i_chroma_qp_index_offset = 2;
+    pps->i_pic_init_qp = cfg->pic_init_qp;
+    pps->i_pic_init_qs = cfg->pic_init_qp;
+    pps->i_chroma_qp_index_offset = cfg->chroma_qp_index_offset;
     pps->b_deblocking_filter_control = 1;
     pps->b_constrained_intra_pred = 0;
     pps->b_redundant_pic_cnt = 0;
-    pps->b_transform_8x8_mode = 0;
+    pps->b_transform_8x8_mode = cfg->transform8x8_mode;
 
     (void)cfg;
 }
@@ -1733,6 +1733,7 @@ MPP_RET hal_h264e_vpu_deinit(void *hal)
 
 static MPP_RET hal_h264e_vpu_validate_syntax(h264e_syntax *syn)
 {
+    RK_U32 input_image_format = H264E_VPU_CSP_NONE;
     h264e_hal_debug_enter();
 
     /* validate */
@@ -1741,8 +1742,8 @@ static MPP_RET hal_h264e_vpu_validate_syntax(h264e_syntax *syn)
     /* adjust */
     syn->output_strm_limit_size /= 8; /* 64-bit addresses */
     syn->output_strm_limit_size &= (~0x07);  /* 8 multiple size */
-    syn->input_image_format = (RK_U32)hal_h264e_vpu_convert_csp(syn->input_image_format);
-    H264E_HAL_VALIDATE_NEQ(syn->input_image_format, "input_image_format", H264E_VPU_CSP_NONE);
+    input_image_format = (RK_U32)hal_h264e_vpu_convert_csp(syn->input_image_format);
+    H264E_HAL_VALIDATE_NEQ(input_image_format, "input_image_format", H264E_VPU_CSP_NONE);
 
     h264e_hal_debug_leave();
     return MPP_OK;
@@ -1890,7 +1891,7 @@ MPP_RET hal_h264e_vpu_gen_regs(void *hal, HalTaskInfo *task)
     H264E_HAL_SET_REG(reg, VEPU_REG_CHKPT_DELTA_QP, val);
 
     val = VEPU_REG_MAD_THRESHOLD(syn->mad_threshold)
-          | VEPU_REG_IN_IMG_CTRL_FMT(syn->input_image_format)
+          | VEPU_REG_IN_IMG_CTRL_FMT(hal_h264e_vpu_convert_csp(syn->input_image_format))
           | VEPU_REG_IN_IMG_ROTATE_MODE(0)
           | VEPU_REG_SIZE_TABLE_PRESENT; //FIXED
     H264E_HAL_SET_REG(reg, VEPU_REG_ENC_CTRL1, val);

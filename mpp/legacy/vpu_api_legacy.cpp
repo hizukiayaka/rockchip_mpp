@@ -528,7 +528,7 @@ RK_S32 VpuApiLegacy::encode(VpuCodecContext *ctx, EncInputStream_t *aEncInStrm, 
             goto ENCODE_FAIL;
         }
         if (task == NULL) {
-            mpp_log("mpi dequeue from MPP_PORT_INPUT fail, task equal with NULL!");
+            mpp_dbg_f(MPP_DBG_NORMAL, "mpi dequeue from MPP_PORT_INPUT fail, task equal with NULL!");
             usleep(3000);
         } else
             break;

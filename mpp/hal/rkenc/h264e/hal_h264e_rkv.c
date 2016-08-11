@@ -27,6 +27,8 @@
 #include "hal_h264e.h"
 #include "hal_h264e_rkv.h"
 
+#define RKVENC_DUMP_INFO                0
+
 #define RKVENC_FRAME_TYPE_AUTO          0x0000  /* Let x264 choose the right type */
 #define RKVENC_FRAME_TYPE_IDR           0x0001
 #define RKVENC_FRAME_TYPE_I             0x0002
@@ -505,6 +507,7 @@ static MPP_RET hal_h264e_rkv_open_dump_files(void *dump_files)
 
 static void hal_h264e_rkv_dump_mpp_syntax_in(h264e_syntax *syn, h264e_hal_context *ctx)
 {
+#if RKVENC_DUMP_INFO
     h264e_hal_rkv_dump_files *dump_files = (h264e_hal_rkv_dump_files *)ctx->dump_files;
     FILE *fp = dump_files->fp_mpp_syntax_in;
     if (fp) {
@@ -539,10 +542,15 @@ static void hal_h264e_rkv_dump_mpp_syntax_in(h264e_syntax *syn, h264e_hal_contex
     } else {
         mpp_log("try to dump data to mpp_syntax_in.txt, but file is not opened");
     }
+#else
+    (void)ctx;
+    (void)syn;
+#endif
 }
 
 static void hal_h264e_rkv_dump_mpp_reg_in(h264e_hal_context *ctx)
 {
+#if RKVENC_DUMP_INFO
     RK_S32 k = 0;
     h264e_hal_rkv_dump_files *dump_files = (h264e_hal_rkv_dump_files *)ctx->dump_files;
     FILE *fp = dump_files->fp_mpp_reg_in;
@@ -698,10 +706,14 @@ static void hal_h264e_rkv_dump_mpp_reg_in(h264e_hal_context *ctx)
     } else {
         mpp_log("try to dump data to mpp_reg_in.txt, but file is not opened");
     }
+#else
+    (void)ctx;
+#endif
 }
 
 static void hal_h264e_rkv_dump_mpp_extra_info_cfg(h264e_hal_context *ctx, h264e_control_extra_info_cfg *cfg)
 {
+#if RKVENC_DUMP_INFO
     h264e_hal_rkv_dump_files *dump_files = (h264e_hal_rkv_dump_files *)ctx->dump_files;
     FILE *fp = dump_files->fp_mpp_extra_ino_cfg;
     if (fp) {
@@ -727,10 +739,15 @@ static void hal_h264e_rkv_dump_mpp_extra_info_cfg(h264e_hal_context *ctx, h264e_
         fprintf(fp, "\n");
         fflush(fp);
     }
+#else
+    (void)ctx;
+    (void)cfg;
+#endif
 }
 
 static void hal_h264e_rkv_dump_mpp_reg_out(h264e_hal_context *ctx)
 {
+#if RKVENC_DUMP_INFO
     RK_U32 k = 0;
     h264e_hal_rkv_dump_files *dump_files = (h264e_hal_rkv_dump_files *)ctx->dump_files;
     FILE *fp = dump_files->fp_mpp_reg_out;
@@ -750,10 +767,14 @@ static void hal_h264e_rkv_dump_mpp_reg_out(h264e_hal_context *ctx)
     } else {
         mpp_log("try to dump data to mpp_reg_out.txt, but file is not opened");
     }
+#else
+    (void)ctx;
+#endif
 }
 
 static void hal_h264e_rkv_dump_mpp_feedback(h264e_hal_context *ctx)
 {
+#if RKVENC_DUMP_INFO
     h264e_hal_rkv_dump_files *dump_files = (h264e_hal_rkv_dump_files *)ctx->dump_files;
     FILE *fp = dump_files->fp_mpp_feedback;
     if (fp) {
@@ -762,10 +783,14 @@ static void hal_h264e_rkv_dump_mpp_feedback(h264e_hal_context *ctx)
     } else {
         mpp_log("try to dump data to mpp_feedback.txt, but file is not opened");
     }
+#else
+    (void)ctx;
+#endif
 }
 
 static void hal_h264e_rkv_dump_mpp_strm_out_header(h264e_hal_context *ctx, MppPacket packet)
 {
+#if RKVENC_DUMP_INFO
     h264e_hal_rkv_dump_files *dump_files = (h264e_hal_rkv_dump_files *)ctx->dump_files;
     void *ptr   = mpp_packet_get_data(packet);
     size_t len  = mpp_packet_get_length(packet);
@@ -777,11 +802,16 @@ static void hal_h264e_rkv_dump_mpp_strm_out_header(h264e_hal_context *ctx, MppPa
     } else {
         mpp_log("try to dump strm header to mpp_strm_out.txt, but file is not opened");
     }
+#else
+    (void)ctx;
+    (void)packet;
+#endif
 }
 
 
 void hal_h264e_rkv_dump_mpp_strm_out(h264e_hal_context *ctx, MppBuffer *hw_buf)
 {
+#if RKVENC_DUMP_INFO
     h264e_hal_rkv_dump_files *dump_files = (h264e_hal_rkv_dump_files *)ctx->dump_files;
     FILE *fp = dump_files->fp_mpp_strm_out;
     if (fp) {
@@ -815,6 +845,10 @@ void hal_h264e_rkv_dump_mpp_strm_out(h264e_hal_context *ctx, MppBuffer *hw_buf)
     } else {
         mpp_log("try to dump data to mpp_strm_out.txt, but file is not opened");
     }
+#else
+    (void)ctx;
+    (void)hw_buf;
+#endif
 }
 
 void hal_h264e_rkv_frame_push( h264e_hal_rkv_frame **list, h264e_hal_rkv_frame *frame )
@@ -1235,6 +1269,7 @@ static MPP_RET hal_h264e_rkv_reference_frame_set( h264e_hal_context *ctx, h264e_
     h264e_hal_rkv_extra_info *extra_info = (h264e_hal_rkv_extra_info *)ctx->extra_info;
     h264e_hal_sps *sps = &extra_info->sps;
     h264e_hal_ref_param *ref_cfg = &ctx->param.ref;
+    RK_U32 frame_coding_type = syn->frame_coding_type;
 
     h264e_hal_debug_enter();
 
@@ -1247,14 +1282,26 @@ static MPP_RET hal_h264e_rkv_reference_frame_set( h264e_hal_context *ctx, h264e_
     dpb_ctx->i_max_ref0 = ref_cfg->i_frame_reference;
     dpb_ctx->i_max_ref1 = H264E_HAL_MIN( sps->vui.i_num_reorder_frames, ref_cfg->i_frame_reference );
 
-    if (syn->frame_coding_type == RKVENC_FRAME_TYPE_IDR) {
+    if (syn->frame_num == 0) {
+        frame_coding_type = RKVENC_FRAME_TYPE_IDR;
+    } else {
+        if (frame_coding_type) {
+            /* ASIC_INTRA */
+            frame_coding_type = RKVENC_FRAME_TYPE_I;
+        } else {
+            /* ASIC_INTER */
+            frame_coding_type = RKVENC_FRAME_TYPE_P;
+        }
+    }
+
+    if (frame_coding_type == RKVENC_FRAME_TYPE_IDR) {
         dpb_ctx->i_frame_num = 0;
         dpb_ctx->frames.i_last_idr = dpb_ctx->i_frame_cnt;
     }
 
     dpb_ctx->fdec->i_frame_cnt = dpb_ctx->i_frame_cnt;
     dpb_ctx->fdec->i_frame_num = dpb_ctx->i_frame_num;
-    dpb_ctx->fdec->i_frame_type = syn->frame_coding_type;
+    dpb_ctx->fdec->i_frame_type = frame_coding_type;
     dpb_ctx->fdec->i_poc = 2 * ( dpb_ctx->fdec->i_frame_cnt - H264E_HAL_MAX( dpb_ctx->frames.i_last_idr, 0 ) );
 
 
@@ -1279,21 +1326,21 @@ static MPP_RET hal_h264e_rkv_reference_frame_set( h264e_hal_context *ctx, h264e_
     dpb_ctx->b_ref_pic_list_reordering[1] = 0;
 
     /* calculate nal type and nal ref idc */
-    if ( syn->frame_coding_type == RKVENC_FRAME_TYPE_IDR ) { //TODO: extend syn->frame_coding_type definition
+    if (frame_coding_type == RKVENC_FRAME_TYPE_IDR) { //TODO: extend syn->frame_coding_type definition
         /* reset ref pictures */
         i_nal_type    = RKVENC_NAL_SLICE_IDR;
         i_nal_ref_idc = RKVENC_NAL_PRIORITY_HIGHEST;
         dpb_ctx->i_slice_type = H264E_HAL_SLICE_TYPE_I;
         hal_h264e_rkv_reference_reset(dpb_ctx);
-    } else if ( syn->frame_coding_type == RKVENC_FRAME_TYPE_I ) {
+    } else if ( frame_coding_type == RKVENC_FRAME_TYPE_I ) {
         i_nal_type    = RKVENC_NAL_SLICE;
         i_nal_ref_idc = RKVENC_NAL_PRIORITY_HIGH; /* Not completely true but for now it is (as all I/P are kept as ref)*/
         dpb_ctx->i_slice_type = H264E_HAL_SLICE_TYPE_I;
-    } else if ( syn->frame_coding_type == RKVENC_FRAME_TYPE_P ) {
+    } else if ( frame_coding_type == RKVENC_FRAME_TYPE_P ) {
         i_nal_type    = RKVENC_NAL_SLICE;
         i_nal_ref_idc = RKVENC_NAL_PRIORITY_HIGH; /* Not completely true but for now it is (as all I/P are kept as ref)*/
         dpb_ctx->i_slice_type = H264E_HAL_SLICE_TYPE_P;
-    } else if ( syn->frame_coding_type == RKVENC_FRAME_TYPE_BREF ) {
+    } else if ( frame_coding_type == RKVENC_FRAME_TYPE_BREF ) {
         i_nal_type    = RKVENC_NAL_SLICE;
         i_nal_ref_idc = RKVENC_NAL_PRIORITY_HIGH;
         dpb_ctx->i_slice_type = H264E_HAL_SLICE_TYPE_B;
@@ -2597,17 +2644,18 @@ MPP_RET hal_h264e_rkv_set_ioctl_extra_info(h264e_rkv_ioctl_extra_info *extra_inf
 static MPP_RET hal_h264e_rkv_validate_syntax(h264e_syntax *syn, h264e_hal_csp_info *src_fmt)
 {
     h264e_hal_debug_enter();
+    RK_U32 input_image_format = syn->input_image_format;
 
     /* validate */
     H264E_HAL_VALIDATE_GT(syn->output_strm_limit_size, "output_strm_limit_size", 0);
 
     /* adjust */
+    *src_fmt = hal_h264e_rkv_convert_csp(input_image_format);
+    syn->input_image_format = src_fmt->fmt;
     if ((h264e_hal_rkv_csp)syn->input_image_format == H264E_RKV_CSP_YUV420P) {
         syn->input_cb_addr = syn->input_luma_addr;
         syn->input_cr_addr = syn->input_luma_addr;
     }
-    *src_fmt = hal_h264e_rkv_convert_csp(syn->input_image_format);
-    syn->input_image_format = src_fmt->fmt;
     H264E_HAL_VALIDATE_NEQ(syn->input_image_format, "input_image_format", H264E_RKV_CSP_NONE);
 
     h264e_hal_debug_leave();
@@ -2801,13 +2849,17 @@ MPP_RET hal_h264e_rkv_gen_regs(void *hal, HalTaskInfo *task)
     {
         RK_U32 stridey = 0, stridec = 0;
         stridey = (regs->swreg19.src_rot == 1 || regs->swreg19.src_rot == 3) ? (syn->pic_luma_height - 1) : (syn->pic_luma_width - 1);
-        if (regs->swreg14.src_cfmt == 0 )
+        if (regs->swreg14.src_cfmt == H264E_RKV_CSP_BGRA8888)
             stridey = (stridey + 1) * 4 - 1;
-        else if (regs->swreg14.src_cfmt == 1 )
+        else if (regs->swreg14.src_cfmt == H264E_RKV_CSP_BGR888 )
             stridey = (stridey + 1) * 3 - 1;
-        else if ( regs->swreg14.src_cfmt == 2 || regs->swreg14.src_cfmt == 8 || regs->swreg14.src_cfmt == 9 )
+        else if (regs->swreg14.src_cfmt == H264E_RKV_CSP_BGR565 ||
+                 regs->swreg14.src_cfmt == H264E_RKV_CSP_YUYV422 ||
+                 regs->swreg14.src_cfmt == H264E_RKV_CSP_UYVY422)
             stridey = (stridey + 1) * 2 - 1;
-        stridec = (regs->swreg14.src_cfmt == 4 || regs->swreg14.src_cfmt == 6) ? stridey : ((stridey + 1) / 2 - 1);
+        stridec = (regs->swreg14.src_cfmt == H264E_RKV_CSP_YUV422SP ||
+                   regs->swreg14.src_cfmt == H264E_RKV_CSP_YUV420SP) ?
+                   stridey : ((stridey + 1) / 2 - 1);
         regs->swreg23.src_ystrid    = stridey; //syn->swreg23.src_ystrid;
         regs->swreg23.src_cstrid    = stridec; //syn->swreg23.src_cstrid;    ////YUV420 planar;
     }
@@ -2977,21 +3029,34 @@ MPP_RET hal_h264e_rkv_gen_regs(void *hal, HalTaskInfo *task)
 
     {
         RK_U32 i_nal_type = 0, i_nal_ref_idc = 0;
-        if ( syn->frame_coding_type == RKVENC_FRAME_TYPE_IDR ) { //TODO: extend syn->frame_coding_type definition
+        RK_U32 frame_coding_type = syn->frame_coding_type;
+
+        if (syn->frame_num == 0) {
+            frame_coding_type = RKVENC_FRAME_TYPE_IDR;
+        } else {
+            if (frame_coding_type) {
+                /* ASIC_INTRA */
+                frame_coding_type = RKVENC_FRAME_TYPE_I;
+            } else {
+                /* ASIC_INTER */
+                frame_coding_type = RKVENC_FRAME_TYPE_P;
+            }
+        }
+
+        if (frame_coding_type == RKVENC_FRAME_TYPE_IDR ) { //TODO: extend syn->frame_coding_type definition
             /* reset ref pictures */
             i_nal_type    = RKVENC_NAL_SLICE_IDR;
             i_nal_ref_idc = RKVENC_NAL_PRIORITY_HIGHEST;
-        } else if ( syn->frame_coding_type == RKVENC_FRAME_TYPE_I ) {
+        } else if (frame_coding_type == RKVENC_FRAME_TYPE_I ) {
             i_nal_type    = RKVENC_NAL_SLICE;
             i_nal_ref_idc = RKVENC_NAL_PRIORITY_HIGH; /* Not completely true but for now it is (as all I/P are kept as ref)*/
-        } else if ( syn->frame_coding_type == RKVENC_FRAME_TYPE_P ) {
+        } else if (frame_coding_type == RKVENC_FRAME_TYPE_P ) {
             i_nal_type    = RKVENC_NAL_SLICE;
             i_nal_ref_idc = RKVENC_NAL_PRIORITY_HIGH; /* Not completely true but for now it is (as all I/P are kept as ref)*/
-        } else if ( syn->frame_coding_type == RKVENC_FRAME_TYPE_BREF ) {
+        } else if (frame_coding_type == RKVENC_FRAME_TYPE_BREF ) {
             i_nal_type    = RKVENC_NAL_SLICE;
             i_nal_ref_idc = RKVENC_NAL_PRIORITY_HIGH;
         } else { /* B frame */
-
             i_nal_type    = RKVENC_NAL_SLICE;
             i_nal_ref_idc = RKVENC_NAL_PRIORITY_DISPOSABLE;
         }

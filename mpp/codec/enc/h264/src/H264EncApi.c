@@ -847,6 +847,7 @@ H264EncRet H264EncStrmEncode(H264ECtx *pEncInst, const H264EncIn * pEncIn,
 RK_S32 EncAsicCheckHwStatus(asicData_s *asic)
 {
     RK_S32 ret = ASIC_STATUS_FRAME_READY;
+/*
     RK_U32 status = asic->regs.hw_status;
 
     if (status & ASIC_STATUS_ERROR) {
@@ -858,7 +859,7 @@ RK_S32 EncAsicCheckHwStatus(asicData_s *asic)
     } else {
         ret = ASIC_STATUS_BUFF_FULL;
     }
-
+*/
     return ret;
 }
 

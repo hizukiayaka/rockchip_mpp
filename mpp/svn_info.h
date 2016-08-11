@@ -17,10 +17,10 @@
 #ifndef __VERSION_H__
 #define __VERSION_H__
 
-#define	SVN_VERSION             "1174"
-#define	SVN_AUTHOR              "ChenHengming"
-#define	SVN_DATE                "2016-08-08 08:45:08 +0800 (Mon, 08 Aug 2016)"
-#define	SVN_ONE_LINE            "r1174 author: ChenHengming date: 2016-08-08 08:45:08 +0800 (Mon, 08 Aug 2016)"
+#define	SVN_VERSION             "-1"
+#define	SVN_AUTHOR              ""
+#define	SVN_DATE                ""
+#define	SVN_ONE_LINE            "r-1 author:  date: "
 
 #endif /*__VERSION_H__*/
 
