@@ -307,7 +307,7 @@ H264EncRet H264EncSetRateCtrl(H264ECtx *pEncInst,
     /* Check for invalid input values */
     if (pRateCtrl->pictureRc > 1 ||
         pRateCtrl->mbRc > 1 || pRateCtrl->pictureSkip > 1 || pRateCtrl->hrd > 1) {
-        mpp_err_f("ERROR Invalid enable/disable value\n");
+        mpp_dbg_f(MPP_DBG_NORMAL, "ERROR Invalid enable/disable value\n");
         return H264ENC_INVALID_ARGUMENT;
     }
 
@@ -315,26 +315,26 @@ H264EncRet H264EncSetRateCtrl(H264ECtx *pEncInst,
         pRateCtrl->qpMin > 51 ||
         pRateCtrl->qpMax > 51 ||
         pRateCtrl->qpMax < pRateCtrl->qpMin) {
-        mpp_err_f("ERROR Invalid QP\n");
+        mpp_dbg_f(MPP_DBG_NORMAL, "ERROR Invalid QP\n");
         return H264ENC_INVALID_ARGUMENT;
     }
 
     if ((pRateCtrl->qpHdr != -1) &&
         (pRateCtrl->qpHdr < (RK_S32)pRateCtrl->qpMin ||
          pRateCtrl->qpHdr > (RK_S32)pRateCtrl->qpMax)) {
-        mpp_err_f("ERROR QP out of range\n");
+        mpp_dbg_f(MPP_DBG_NORMAL, "ERROR QP out of range\n");
         return H264ENC_INVALID_ARGUMENT;
     }
     if ((RK_U32)(pRateCtrl->intraQpDelta + 12) > 24) {
-        mpp_err_f("ERROR intraQpDelta out of range\n");
+        mpp_dbg_f(MPP_DBG_NORMAL, "ERROR intraQpDelta out of range\n");
         return H264ENC_INVALID_ARGUMENT;
     }
     if (pRateCtrl->fixedIntraQp > 51) {
-        mpp_err_f("ERROR fixedIntraQp out of range\n");
+        mpp_dbg_f(MPP_DBG_NORMAL, "ERROR fixedIntraQp out of range\n");
         return H264ENC_INVALID_ARGUMENT;
     }
     if (pRateCtrl->gopLen < 1 || pRateCtrl->gopLen > 150) {
-        mpp_err_f("ERROR Invalid GOP length\n");
+        mpp_dbg_f(MPP_DBG_NORMAL, "ERROR Invalid GOP length\n");
         return H264ENC_INVALID_ARGUMENT;
     }
 
@@ -343,7 +343,7 @@ H264EncRet H264EncSetRateCtrl(H264ECtx *pEncInst,
          pRateCtrl->pictureSkip || pRateCtrl->hrd) &&
         (pRateCtrl->bitPerSecond < 10000 ||
          pRateCtrl->bitPerSecond > H264ENC_MAX_BITRATE)) {
-        mpp_err_f("ERROR Invalid bitPerSecond\n");
+        mpp_dbg_f(MPP_DBG_NORMAL, "ERROR Invalid bitPerSecond\n");
         return H264ENC_INVALID_ARGUMENT;
     }
 
@@ -381,12 +381,12 @@ H264EncRet H264EncSetRateCtrl(H264ECtx *pEncInst,
         /* if HRD is ON we have to obay all its limits */
         if (pRateCtrl->hrd != 0) {
             if (cpbSize > H264MaxCPBS[level]) {
-                mpp_err_f("ERROR. HRD is ON. hrdCpbSize higher than maximum allowed for stream level\n");
+                mpp_dbg_f(MPP_DBG_NORMAL, "ERROR. HRD is ON. hrdCpbSize higher than maximum allowed for stream level\n");
                 return H264ENC_INVALID_ARGUMENT;
             }
 
             if (bps > H264MaxBR[level]) {
-                mpp_err_f("ERROR. HRD is ON. bitPerSecond higher than maximum allowed for stream level\n");
+                mpp_dbg_f(MPP_DBG_NORMAL, "ERROR. HRD is ON. bitPerSecond higher than maximum allowed for stream level\n");
                 return H264ENC_INVALID_ARGUMENT;
             }
         }
