@@ -10,8 +10,6 @@ add_library(mpp_hal STATIC
     hal_regdrv.c
     )
 
-set_target_properties(mpp_hal PROPERTIES FOLDER "mpp/hal")
-
 add_subdirectory(dummy)
 
 add_subdirectory(rkdec/h264d)
