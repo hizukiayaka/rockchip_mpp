@@ -1,4 +1,14 @@
 # vim: syntax=cmake
+cmake_minimum_required(VERSION 2.6)
+find_package(PkgConfig)
+
+PROJECT(rockchip_mpp C CXX)
+
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+
+set(LIBROCKCHIP_MPP_VERSION "1")
+set(LIBROCKCHIP_MPP_ABI_VERSION "1")
 # ----------------------------------------------------------------------------
 # setup mpp codec config first
 # ----------------------------------------------------------------------------
@@ -39,38 +49,37 @@ add_subdirectory(hal)
 # ----------------------------------------------------------------------------
 # add mpp implement
 # ----------------------------------------------------------------------------
-set (MPP_SRC
+add_library(rockchip_mpp SHARED
     mpp_info.cpp
     mpp.cpp
     mpp_impl.cpp
     mpi.cpp
-    )
+)
+target_link_libraries(rockchip_mpp
+    mpp_base mpp_codec mpp_hal mpp_vproc
+)
+target_include_directories(rockchip_mpp PUBLIC
+    "${CMAKE_CURRENT_SOURCE_DIR}/inc"
+)
 
-set(MPP_VERSION "0")
-set(MPP_ABI_VERSION "1")
+add_library(rockchip_mpp_static STATIC
+    mpp_info.cpp
+    mpp.cpp
+    mpp_impl.cpp
+    mpi.cpp
+)
+target_link_libraries(rockchip_mpp_static
+    mpp_base mpp_codec mpp_hal
+)
+target_include_directories(rockchip_mpp_static PUBLIC
+    "${CMAKE_CURRENT_SOURCE_DIR}/inc"
+)
 
-add_library(${MPP_STATIC} STATIC ${MPP_SRC})
-set_target_properties(${MPP_STATIC} PROPERTIES FOLDER "mpp")
-set_target_properties(${MPP_STATIC} PROPERTIES CLEAN_DIRECT_OUTPUT 1)
-target_link_libraries(${MPP_STATIC} mpp_base mpp_codec mpp_hal mpp_vproc)
+set_target_properties(rockchip_mpp PROPERTIES VERSION
+    ${LIBROCKCHIP_MPP_VERSION} SOVERSION ${LIBROCKCHIP_MPP_ABI_VERSION})
 
-add_library(${MPP_SHARED} SHARED ${MPP_SRC})
-set_target_properties(${MPP_SHARED} PROPERTIES FOLDER "mpp")
-set_target_properties(${MPP_SHARED} PROPERTIES CLEAN_DIRECT_OUTPUT 1)
-target_link_libraries(${MPP_SHARED} ${MPP_STATIC})
-set_target_properties(${MPP_SHARED} PROPERTIES C_VISIBILITY_PRESET default)
-set_target_properties(${MPP_SHARED} PROPERTIES CXX_VISIBILITY_PRESET default)
-
-# NOTE: due to legacy libray naming issue we can not support version on Android
-if (NOT ANDROID)
-set_target_properties(${MPP_SHARED} PROPERTIES VERSION ${MPP_VERSION})
-set_target_properties(${MPP_SHARED} PROPERTIES SOVERSION ${MPP_ABI_VERSION})
-endif()
-
+install(TARGETS rockchip_mpp LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}")
+install(TARGETS rockchip_mpp_static ARCHIVE DESTINATION
+    "${CMAKE_INSTALL_LIBDIR}")
 
 add_subdirectory(legacy)
-
-install(TARGETS ${MPP_STATIC} ${MPP_SHARED}
-        ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-        LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-        )
