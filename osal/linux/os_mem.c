@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+#if defined(__gnu_linux__)
 #include <stdlib.h>
 #include "os_mem.h"
 
@@ -33,4 +34,4 @@ void os_free(void *ptr)
 {
     free(ptr);
 }
-
+#endif

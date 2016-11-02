@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+#if defined(__gnu_linux__)
 #include <stdio.h>
 #include <stdarg.h>
 
@@ -32,4 +33,4 @@ void os_err(const char* tag, const char* msg, va_list list)
     snprintf(line, sizeof(line), "%s: %s", tag, msg);
     vfprintf(stderr, line, list);
 }
-
+#endif

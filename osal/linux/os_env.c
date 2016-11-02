@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+#if defined(__gnu_linux__)
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -59,5 +60,4 @@ RK_S32 os_set_env_str(const char *name, char *value)
 {
     return setenv(name, value, 1);
 }
-
-
+#endif

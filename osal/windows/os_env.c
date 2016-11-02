@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+#if defined(_WIN32)
 #include <stdio.h>
 #include <stdlib.h>
 #include "os_env.h"
@@ -60,5 +61,4 @@ RK_S32 os_set_env_str(const char *name, char *value)
     _snprintf(buf, sizeof(buf), "%s=%s", name, value);
     return _putenv(buf);
 }
-
-
+#endif

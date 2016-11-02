@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+#if defined(__gnu_linux__)
 #include <stdio.h>
 
 #include "os_mem.h"
@@ -153,4 +154,4 @@ MPP_RET os_allocator_get(os_allocator *api, MppBufferType type)
     }
     return ret;
 }
-
+#endif

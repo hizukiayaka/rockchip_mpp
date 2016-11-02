@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+#if defined(_WIN32)
 #include <stdio.h>
 #include <stdarg.h>
 
@@ -32,4 +33,4 @@ void os_err(const char* tag, const char* msg, va_list list)
     _snprintf(line, sizeof(line), "%s: %s", tag, msg);
     vfprintf(stderr, line, list);
 }
-
+#endif

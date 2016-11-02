@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+#if defined(__ANDROID__)
 #include <errno.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
@@ -135,4 +136,4 @@ MPP_RET os_allocator_get(os_allocator *api, MppBufferType type)
     }
     return ret;
 }
-
+#endif
