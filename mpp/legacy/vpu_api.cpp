@@ -295,7 +295,7 @@ RK_S32 vpu_open_context(VpuCodecContext **ctx)
     } else if (!!access("/dev/rkvdec", F_OK)) {
         /* if there is no rkvdec it means the platform must be vpu1 */
         if (s && s->videoCoding == OMX_RK_VIDEO_CodingHEVC &&
-            !access("/dev/hevc_service", F_OK)) {
+            !access("/dev/hevc-service", F_OK)) {
             /* if this is a hevc request and exist hevc_service for decoding use mpp */
             use_mpp = 1;
         } else {
