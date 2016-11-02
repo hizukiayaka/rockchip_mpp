@@ -50,8 +50,8 @@ static RK_S32 vpu_service_status = -1;
 
 static const char *name_rkvdec = "/dev/rkvdec";
 static const char *name_rkvenc = "/dev/rkvenc";
-static const char *name_hevc_service = "/dev/hevc_service";
-static const char *name_vpu_service = "/dev/vpu_service";
+static const char *name_hevc_service = "/dev/hevc-service";
+static const char *name_vpu_service = "/dev/vpu-service";
 
 
 int VPUClientInit(VPU_CLIENT_TYPE type)
@@ -94,7 +94,7 @@ int VPUClientInit(VPU_CLIENT_TYPE type)
     mpp_env_get_u32("vpu_debug", &vpu_debug, 0);
 
     if (fd == -1) {
-        mpp_err_f("failed to open %s\n", name);
+        mpp_err_f("failed to open %s %s\n", name, strerror(errno));
         return -1;
     }
     ret = ioctl(fd, VPU_IOC_SET_CLIENT_TYPE, (RK_U32)type);
