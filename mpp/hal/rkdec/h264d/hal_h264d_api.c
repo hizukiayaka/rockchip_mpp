@@ -38,9 +38,7 @@
 
 #include "hal_h264d_rkv_reg.h"
 #include "hal_h264d_vdpu_reg.h"
-
-
-
+#include "hal_h264d_vdpu1_reg.h"
 
 static void close_log_files(LogEnv_t *env)
 {
@@ -213,7 +211,8 @@ MPP_RET hal_h264d_init(void *hal, MppHalCfg *cfg)
         RK_S32 value = 0;
         mpp_env_get_u32("use_mpp_mode", &mode, 0);
         value = (!!access("/dev/rkvdec", F_OK));
-        cfg->device_id = (value || (mode & VDPU_MODE)) ? HAL_VDPU : HAL_RKVDEC;
+	/* Force the VDPU1 mode */
+        cfg->device_id = HAL_VDPU1;
     }
 #endif
     switch (cfg->device_id) {
@@ -238,6 +237,18 @@ MPP_RET hal_h264d_init(void *hal, MppHalCfg *cfg)
         p_api->flush   = vdpu_h264d_flush;
         p_api->control = vdpu_h264d_control;
         vpu_client = VPU_DEC;
+        break;
+    case HAL_VDPU1:
+	p_api->init    = vdpu1_h264d_init;
+	p_api->deinit  = vdpu1_h264d_deinit;
+	p_api->reg_gen = vdpu1_h264d_gen_regs;
+	p_api->start   = vdpu1_h264d_start;
+	p_api->wait    = vdpu1_h264d_wait;
+	p_api->reset   = vdpu1_h264d_reset;
+	p_api->flush   = vdpu1_h264d_flush;
+	p_api->control = vdpu1_h264d_control;
+	vpu_client = VPU_DEC;
+	break;
     default:
         break;
     }
@@ -412,4 +423,3 @@ const MppHalApi hal_api_h264d = {
     hal_h264d_flush,
     hal_h264d_control,
 };
-

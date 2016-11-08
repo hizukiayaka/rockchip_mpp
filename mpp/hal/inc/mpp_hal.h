@@ -28,6 +28,7 @@ typedef enum MppHalType_e {
 
 
 typedef enum MppHalHardType_e {
+    HAL_VDPU1,
     HAL_VDPU,           //!< vpu combined decoder
     HAL_VEPU,           //!< vpu combined encoder
     HAL_RKVDEC,         //!< rock-chip h264 h265 vp9 combined decoder
@@ -99,4 +100,3 @@ MPP_RET mpp_hal_control(MppHal ctx, RK_S32 cmd, void *param);
 #endif
 
 #endif /*__MPP_HAL_H__*/
-
