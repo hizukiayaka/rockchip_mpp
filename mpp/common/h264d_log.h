@@ -87,7 +87,7 @@ do {\
 #define H264D_LOG(fmt, ...)\
 do {\
     if (H264D_DBG_LOG & rkv_h264d_parse_debug)\
-        {  mpp_log(fmt, ## __VA_ARGS__); }\
+        {  mpp_log_f(fmt, ## __VA_ARGS__); }\
 } while (0)
 
 
