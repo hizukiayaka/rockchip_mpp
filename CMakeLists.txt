@@ -49,7 +49,7 @@ add_subdirectory(mpp)
 # ----------------------------------------------------------------------------
 #  test / demo
 # ----------------------------------------------------------------------------
-#add_subdirectory(test)
+add_subdirectory(test)
 
 CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/inc/config.h.cmake"
 "${CMAKE_CURRENT_SOURCE_DIR}/inc/config.h")
