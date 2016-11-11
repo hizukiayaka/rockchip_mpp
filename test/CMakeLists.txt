@@ -16,9 +16,9 @@ macro(add_mpp_test module)
         # NOTE: use share library on Linux and Android
         #       use static library for window debug
         if(UNIX)
-            target_link_libraries(${test_name} mpp_shared mpp_legacy_shared utils)
+            target_link_libraries(${test_name} rockchip_mpp rockchip_vpu utils)
         else()
-            target_link_libraries(${test_name} mpp_shared mpp_legacy utils)
+            target_link_libraries(${test_name} rockchip_mpp_static rockchip_vpu_static utils)
         endif()
         set_target_properties(${test_name} PROPERTIES FOLDER "test")
         #install(TARGETS ${test_name} RUNTIME DESTINATION ${TEST_INSTALL_DIR})
