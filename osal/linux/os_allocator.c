@@ -140,6 +140,7 @@ MPP_RET os_allocator_get(os_allocator *api, MppBufferType type)
     } break;
     case MPP_BUFFER_TYPE_ION : {
         *api = allocator_ion;
+        *api = allocator_drm;
     } break;
     case MPP_BUFFER_TYPE_V4L2 : {
         mpp_err("os_allocator_get Linux MPP_BUFFER_TYPE_V4L2 do not implement yet\n");
