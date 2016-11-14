@@ -21,7 +21,9 @@
 #include "vpu.h"
 #include <string.h>
 
-static RK_S32 commit_memory_handle(vpu_display_mem_pool *p, RK_S32 mem_hdl, RK_S32 size, RK_S32 index)
+static RK_S32
+commit_memory_handle
+(vpu_display_mem_pool *p, RK_S32 mem_hdl, RK_S32 size, RK_S32 index)
 {
     MppBufferInfo info;
     vpu_display_mem_pool_impl *p_mempool = (vpu_display_mem_pool_impl *)p;
@@ -29,15 +31,43 @@ static RK_S32 commit_memory_handle(vpu_display_mem_pool *p, RK_S32 mem_hdl, RK_S
     memset(&info, 0, sizeof(MppBufferInfo));
     info.type = MPP_BUFFER_TYPE_ION;
     info.fd = mem_hdl;
-	info.size = size;
-	info.index = index;
-    //info.size = size & 0x07ffffff;
-    //info.index = (size & 0xf8000000) >> 27;
+    info.size = size;
+    info.index = index;
 
     p_mempool->size = size;
     p_mempool->buff_size = size;
 
     mpp_buffer_commit(p_mempool->group, &info);
+    return info.fd;
+}
+
+static RK_S32
+commit_memory_vpumem
+(vpu_display_mem_pool *p, VPUMemLinear_t *v)
+{
+    MppBufferInfo info;
+    vpu_display_mem_pool_impl *p_mempool = (vpu_display_mem_pool_impl *)p;
+    MppBuffer buffer = NULL;
+
+    memset(&info, 0, sizeof(MppBufferInfo));
+    info.type = MPP_BUFFER_TYPE_ION;
+    info.fd = VPUMemGetFD(v);
+    info.size = v->size;
+    info.index = v->index;
+
+    p_mempool->size = v->size;
+    p_mempool->buff_size = v->size;
+
+    mpp_buffer_import_with_tag
+        (p_mempool->group, &info, &buffer, MODULE_TAG, __FUNCTION__);
+
+    memset(&info, 0, sizeof(MppBufferInfo));
+    mpp_buffer_info_get(buffer, &info);
+    v->vir_addr = (RK_U32*)mpp_buffer_get_ptr(buffer);
+    v->offset = (RK_U32*)buffer;
+
+    mpp_buffer_put(buffer);
+
     return info.fd;
 }
 
@@ -115,6 +145,7 @@ vpu_display_mem_pool* open_vpu_memory_pool()
         return NULL;
     }
     p_mempool->commit_hdl     = commit_memory_handle;
+    p_mempool->commit_vpu     = commit_memory_vpumem;
     p_mempool->get_free       = get_free_memory_vpumem;
     p_mempool->put_used       = put_used_memory_handle;
     p_mempool->inc_used       = inc_used_memory_handle_ref;
@@ -142,6 +173,7 @@ int create_vpu_memory_pool_allocator(vpu_display_mem_pool **ipool, int num, int 
         return -1;
     }
     p_mempool->commit_hdl     = commit_memory_handle;
+    p_mempool->commit_vpu     = commit_memory_vpumem;
     p_mempool->get_free       = get_free_memory_vpumem;
     p_mempool->put_used       = put_used_memory_handle;
     p_mempool->inc_used       = inc_used_memory_handle_ref;
