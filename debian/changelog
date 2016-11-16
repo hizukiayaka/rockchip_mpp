@@ -1,0 +1,38 @@
+mpp (1.2.0-2) testing; urgency=medium
+
+  * [mpp]: a fixup for wrong place scope symbols
+  * .gitignore: the intial version of gitignore
+  * build: support cross build in debian
+  * mpp: add pkgconfig file
+  * debian: support install for multiarch
+  * debian: add debian build rules
+  * utils: move the header files to common include directories
+  * osal: match system implementation with pre-defined marco
+  * osal: rename the directory of windows implementation
+  * osal: build: update the build system
+  * osal: build: use system default thread library
+  * osal test fixup
+  * osal: build: test: do not install unit test
+  * mpp: move header files into header directory
+  * mpp: test: build: rename the mpp library name in unit test
+  * mpp: test: build: renmae
+  * mpp: legacy: rename mpp legacy library as rockchip_vpu
+  * mpp: build: update build rules
+  * build: a simple build rules
+  * mpp: install mpp library to target
+  * build: install development files
+  * build: add pkgconfig support
+
+ -- Randy Li <randy.li@rock-chips.com>  Wed, 03 Aug 2016 10:37:49 +0000
+
+mpp (126d5c661ab7c5ef3d83a41e3dd1873cbeadb5c5-1) unstable; urgency=low
+
+  * A few fixup
+
+ -- Randy Li <randy.li@rock-chips.com>  Wed, 03 Aug 2016 10:22:14 +0000
+
+mpp (378491c467292a2bcf143c0c923c14c5861b03c3-1) unstable; urgency=low
+
+  * The origin version from algorithmn group
+
+ -- Randy Li <randy.li@rock-chips.com>  Wed, 03 Aug 2016 08:14:14 +0000
