@@ -47,7 +47,7 @@ commit_memory_vpumem
 {
     MppBufferInfo info;
     vpu_display_mem_pool_impl *p_mempool = (vpu_display_mem_pool_impl *)p;
-    MppBuffer *buffer = NULL;
+    MppBuffer buffer = NULL;
 
     memset(&info, 0, sizeof(MppBufferInfo));
     info.type = MPP_BUFFER_TYPE_ION;
@@ -59,11 +59,14 @@ commit_memory_vpumem
     p_mempool->buff_size = v->size;
 
     mpp_buffer_import_with_tag
-        (p_mempool->group, &info, buffer, MODULE_TAG, __FUNCTION__);
+        (p_mempool->group, &info, &buffer, MODULE_TAG, __FUNCTION__);
 
-    v->offset = buffer;
+    memset(&info, 0, sizeof(MppBufferInfo));
     mpp_buffer_info_get(buffer, &info);
-    v->vir_addr = info.ptr;
+    v->vir_addr = (RK_U32*)mpp_buffer_get_ptr(buffer);
+    v->offset = (RK_U32*)buffer;
+
+    mpp_buffer_put(buffer);
 
     return info.fd;
 }
