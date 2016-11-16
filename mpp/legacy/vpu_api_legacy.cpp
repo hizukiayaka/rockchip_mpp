@@ -286,6 +286,8 @@ RK_S32 VpuApiLegacy:: decode_getoutframe(DecoderOut_t *aDecOut)
         return VPU_API_ERR_VPU_CODEC_INIT;
     }
 
+    if (NULL == vframe)
+	    printf("%s get null !\n", __func__);
     memset(vframe, 0, sizeof(VPU_FRAME));
 
     if (NULL == mpi) {
@@ -730,9 +732,18 @@ RK_S32 VpuApiLegacy::getDecoderFormat(VpuCodecContext *ctx, DecoderFormat_t *dec
         decoder_format->aligned_frame_size = (decoder_format->aligned_width * decoder_format->aligned_height * 3) >> 1;
         break;
     case OMX_RK_VIDEO_CodingHEVC:        /**< H.265/HEVC */
-        //decoder_format->aligned_width = ((decoder_format->width + 255) & (~255)) | 256;
+#if 0
+#ifdef SOFIA_3GR_LINUX
         decoder_format->aligned_width = (decoder_format->width + 63) & (~63);
         decoder_format->aligned_height = (decoder_format->height + 7) & (~7);
+#else
+        decoder_format->aligned_width = ((decoder_format->width + 255) & (~255)) | 256;
+        decoder_format->aligned_height = (decoder_format->height + 7) & (~7);
+#endif
+#endif
+        decoder_format->aligned_width = ((decoder_format->width + 255) & (~255)) | 256;
+        decoder_format->aligned_height = (decoder_format->height + 7) & (~7);
+
         decoder_format->aligned_stride = decoder_format->aligned_width;
         decoder_format->aligned_frame_size = (decoder_format->aligned_width * decoder_format->aligned_height * 3) >> 1;
         break;
