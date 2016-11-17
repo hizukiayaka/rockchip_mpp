@@ -22,6 +22,9 @@
 
 #define VPU_API_NOPTS_VALUE          (0x8000000000000000LL)
 
+#define VPU_API_DEC_OUTPUT_EOS          0x00000001
+#define VPU_API_DEC_INPUT_SYNC          0x00000002
+
 /*
  * bit definition of ColorType in structure VPU_FRAME
  */
@@ -42,6 +45,11 @@
 #define VPU_OUTPUT_FORMAT_BIT_12                    (0x00020000)
 #define VPU_OUTPUT_FORMAT_BIT_14                    (0x00030000)
 #define VPU_OUTPUT_FORMAT_BIT_16                    (0x00040000)
+
+typedef struct
+{
+    RK_U32 flag;
+} VPU_SYNC;
 
 typedef enum {
     ENC_INPUT_YUV420_PLANAR = 0,              /* YYYY... UUUU... VVVV */
@@ -76,7 +84,7 @@ typedef enum VPU_API_CMD {
     VPU_API_GET_VPUMEM_USED_COUNT,
     VPU_API_DEC_GETFORMAT,
     VPU_API_SET_OUTPUT_BLOCK,
-	VPU_API_DEC_GET_EOS_STATUS,
+    VPU_API_DEC_GET_EOS_STATUS,
 } VPU_API_CMD;
 
 typedef struct {
@@ -160,6 +168,59 @@ typedef struct EncoderOut {
     RK_S32 keyFrame;
 
 } EncoderOut_t;
+
+typedef enum
+{
+  VPU_H264ENC_YUV420_PLANAR = 0,        /* YYYY... UUUU... VVVV */
+  VPU_H264ENC_YUV420_SEMIPLANAR = 1,    /* YYYY... UVUVUV...    */
+  VPU_H264ENC_YUV422_INTERLEAVED_YUYV = 2,      /* YUYVYUYV...          */
+  VPU_H264ENC_YUV422_INTERLEAVED_UYVY = 3,      /* UYVYUYVY...          */
+  VPU_H264ENC_RGB565 = 4,       /* 16-bit RGB           */
+  VPU_H264ENC_BGR565 = 5,       /* 16-bit RGB           */
+  VPU_H264ENC_RGB555 = 6,       /* 15-bit RGB           */
+  VPU_H264ENC_BGR555 = 7,       /* 15-bit RGB           */
+  VPU_H264ENC_RGB444 = 8,       /* 12-bit RGB           */
+  VPU_H264ENC_BGR444 = 9,       /* 12-bit RGB           */
+  VPU_H264ENC_RGB888 = 10,      /* 24-bit RGB           */
+  VPU_H264ENC_BGR888 = 11,      /* 24-bit RGB           */
+  VPU_H264ENC_RGB101010 = 12,   /* 30-bit RGB           */
+  VPU_H264ENC_BGR101010 = 13,   /* 30-bit RGB           */
+  VPU_H264ENC_UNSUPPORTED_FORMAT = -1
+} H264EncPictureType;
+
+/*
+ * Enumeration used to define the possible video compression codings.
+ * NOTE:  This essentially refers to file extensions. If the coding is
+ *        being used to specify the ENCODE type, then additional work
+ *        must be done to configure the exact flavor of the compression
+ *        to be used.  For decode cases where the user application can
+ *        not differentiate between MPEG-4 and H.264 bit streams, it is
+ *        up to the codec to handle this.
+ */
+//sync with the omx_video.h
+typedef enum VPU_VIDEO_CODINGTYPE
+{
+  VPU_VIDEO_CodingUnused,                            /**< Value when coding is N/A */
+  VPU_VIDEO_CodingAutoDetect,                        /**< Autodetection of coding type */
+  VPU_VIDEO_CodingMPEG2,                             /**< AKA: H.262 */
+  VPU_VIDEO_CodingH263,                              /**< H.263 */
+  VPU_VIDEO_CodingMPEG4,                             /**< MPEG-4 */
+  VPU_VIDEO_CodingWMV,                               /**< Windows Media Video (WMV1,WMV2,WMV3)*/
+  VPU_VIDEO_CodingRV,                                /**< all versions of Real Video */
+  VPU_VIDEO_CodingAVC,                               /**< H.264/AVC */
+  VPU_VIDEO_CodingMJPEG,                             /**< Motion JPEG */
+  VPU_VIDEO_CodingVP8,                               /**< VP8 */
+  VPU_VIDEO_CodingVP9,                               /**< VP9 */
+  VPU_VIDEO_CodingVC1 = 0x01000000,                  /**< Windows Media Video (WMV1,WMV2,WMV3)*/
+  VPU_VIDEO_CodingFLV1,                              /**< Sorenson H.263 */
+  VPU_VIDEO_CodingDIVX3,                             /**< DIVX3 */
+  VPU_VIDEO_CodingVP6,
+  VPU_VIDEO_CodingHEVC,                              /**< H.265/HEVC */
+  VPU_VIDEO_CodingAVS,                               /**< AVS+ */
+  VPU_VIDEO_CodingKhronosExtensions = 0x6F000000,    /**< Reserved region for introducing Khronos Standard Extensions */
+  VPU_VIDEO_CodingVendorStartUnused = 0x7F000000,    /**< Reserved region for introducing Vendor Extensions */
+  VPU_VIDEO_CodingMax = 0x7FFFFFFF
+} VPU_VIDEO_CODINGTYPE;
 
 /*
  * Enumeration used to define the possible video compression codings.
