@@ -701,7 +701,6 @@ MPP_RET vdpu_set_asic_regs(H264dHalCtx_t *p_hal, H264dVdpuRegs_t *p_regs)
         if (pp->RefFrameList[i].bPicEntry != 0xff) {
             mpp_buf_slot_get_prop(p_hal->frame_slots, pp->RefFrameList[i].Index7Bits, SLOT_BUFFER, &frame_buf); //!< reference phy addr
             j = i;
-			(void) j;
         } else {
             mpp_buf_slot_get_prop(p_hal->frame_slots, pp->CurrPic.Index7Bits, SLOT_BUFFER, &frame_buf); //!< current out phy addr
         }

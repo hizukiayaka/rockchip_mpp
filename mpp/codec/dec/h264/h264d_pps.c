@@ -166,7 +166,7 @@ MPP_RET activate_pps(H264dVideoCtx_t *p_Vid, H264_PPS_t *pps)
 {
     MPP_RET ret = MPP_ERR_UNKNOW;
 
-    INP_CHECK(ret, !p_Vid || !pps);
+    INP_CHECK(ret, !p_Vid && !pps);
     if (p_Vid->active_pps != pps) {
         if (p_Vid->dec_pic) {
             //!< return if the last picture has already been finished

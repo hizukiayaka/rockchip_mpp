@@ -239,16 +239,16 @@ MPP_RET hal_h264d_init(void *hal, MppHalCfg *cfg)
         vpu_client = VPU_DEC;
         break;
     case HAL_VDPU1:
-	p_api->init    = vdpu1_h264d_init;
-	p_api->deinit  = vdpu1_h264d_deinit;
-	p_api->reg_gen = vdpu1_h264d_gen_regs;
-	p_api->start   = vdpu1_h264d_start;
-	p_api->wait    = vdpu1_h264d_wait;
-	p_api->reset   = vdpu1_h264d_reset;
-	p_api->flush   = vdpu1_h264d_flush;
-	p_api->control = vdpu1_h264d_control;
-	vpu_client = VPU_DEC;
-	break;
+        p_api->init    = vdpu1_h264d_init;
+        p_api->deinit  = vdpu1_h264d_deinit;
+        p_api->reg_gen = vdpu1_h264d_gen_regs;
+        p_api->start   = vdpu1_h264d_start;
+        p_api->wait    = vdpu1_h264d_wait;
+        p_api->reset   = vdpu1_h264d_reset;
+        p_api->flush   = vdpu1_h264d_flush;
+        p_api->control = vdpu1_h264d_control;
+        vpu_client = VPU_DEC;
+        break;
     default:
         break;
     }

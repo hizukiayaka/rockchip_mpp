@@ -534,12 +534,11 @@ __FAILED:
 MPP_RET activate_sps(H264dVideoCtx_t *p_Vid, H264_SPS_t *sps, H264_subSPS_t *subset_sps)
 {
     MPP_RET ret = MPP_ERR_UNKNOW;
-    INP_CHECK(ret, !p_Vid);
+    INP_CHECK(ret, !p_Vid && !sps && !subset_sps);
     if (p_Vid->dec_pic) {
         FUN_CHECK(ret = exit_picture(p_Vid, &p_Vid->dec_pic));
     }
     if (p_Vid->active_mvc_sps_flag) { // layer_id == 1
-    	INP_CHECK(ret, !subset_sps);
         p_Vid->active_sps = &subset_sps->sps;
         p_Vid->active_subsps = subset_sps;
         p_Vid->active_sps_id[0] = 0;
@@ -554,7 +553,6 @@ MPP_RET activate_sps(H264dVideoCtx_t *p_Vid, H264_SPS_t *sps, H264_subSPS_t *sub
         }
         VAL_CHECK(ret, p_Vid->dpb_size[1] > 0);
     } else { //!< layer_id == 0
-    	INP_CHECK(ret, !sps);
         p_Vid->active_sps = sps;
         p_Vid->active_subsps = NULL;
         VAL_CHECK(ret, sps->seq_parameter_set_id >= 0);

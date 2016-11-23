@@ -1,19 +1,19 @@
 /*
-*
-* Copyright 2015 Rockchip Electronics Co. LTD
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ *
+ * Copyright 2015 Rockchip Electronics Co. LTD
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 #ifndef __H264D_GLOBAL_H__
 #define __H264D_GLOBAL_H__
@@ -35,11 +35,12 @@
 
 #define MAX_MARK_SIZE             35   //!< for malloc buffer mark, can be changed
 
-#define MAX_STREM_IN_SIZE         (10*1024*1024)
-
-#define HEAD_BUF_MAX_SIZE         ( 5*1024*1024)
-#define NALU_BUF_MAX_SIZE         (10*1024*1024)
-#define SODB_BUF_MAX_SIZE         (10*1024*1024)
+#define HEAD_BUF_MAX_SIZE         (1*1024*1024)
+#define HEAD_BUF_ADD_SIZE         (512)
+#define NALU_BUF_MAX_SIZE         (2*1024*1024)
+#define NALU_BUF_ADD_SIZE         (512)
+#define SODB_BUF_MAX_SIZE         (2*1024*1024)
+#define SODB_BUF_ADD_SIZE         (512)
 
 //!< PPS parameters
 #define MAXnum_slice_groups_minus1  8
@@ -285,6 +286,7 @@ typedef struct h264_frame_store_t {
     RK_S32    slice_type;
     RK_U32    frame_num;
     RK_S32    structure;
+    RK_U32    is_directout;
     struct h264_store_pic_t *frame;
     struct h264_store_pic_t *top_field;
     struct h264_store_pic_t *bottom_field;
@@ -775,16 +777,20 @@ typedef struct h264_old_slice_par_t {
 } H264_OldSlice_t;
 
 //!< DXVA context
-#define MAX_SLICE_NUM              (1024)
-#define BITSTREAM_MAX_SIZE         (10*1024*1024)
+#define MAX_SLICE_NUM              (20)
+#define ADD_SLICE_SIZE             (5)
+#define BITSTREAM_MAX_SIZE         (2*1024*1024)
+#define BITSTREAM_ADD_SIZE         (512)
 #define SYNTAX_BUF_SIZE            (5)
 typedef struct h264d_dxva_ctx_t {
     RK_U8                            cfgBitstrmRaw;
     struct _DXVA_PicParams_H264_MVC  pp;
     struct _DXVA_Qmatrix_H264        qm;
+    RK_U32                           max_slice_size;
     RK_U32                           slice_count;
     struct _DXVA_Slice_H264_Long     *slice_long;   //!<  MAX_SLICES
     RK_U8                            *bitstream;
+    RK_U32                           max_strm_size;
     RK_U32                           strm_offset;
     struct h264d_syntax_t            syn;
     struct h264_dec_ctx_t            *p_Dec;
@@ -834,6 +840,7 @@ typedef struct h264d_input_ctx_t {
 //!< current stream
 typedef struct h264d_curstrm_t {
     RK_U32    nalu_offset;     //!< The offset of the input stream
+    RK_U32    nalu_max_size;   //!< Cur Unit Buffer size
     RK_U8     *curdata;
 
     RK_S32    nalu_type;
@@ -841,6 +848,7 @@ typedef struct h264d_curstrm_t {
     RK_U8     *nalu_buf;       //!< store read nalu data
 
     RK_U32    head_offset;
+    RK_U32    head_max_size;
     RK_U8     *head_buf;       //!< store header data, sps/pps/slice header
 
     RK_U64    prefixdata;
@@ -1048,7 +1056,5 @@ typedef struct h264_dec_ctx_t {
     RK_S32                     last_frame_slot_idx;
     struct h264_err_ctx_t      errctx;
 } H264_DecCtx_t;
-
-
 
 #endif /* __H264D_GLOBAL_H__ */
