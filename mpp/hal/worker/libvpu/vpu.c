@@ -33,6 +33,8 @@
 #define VPU_IOC_SET_REG                     _IOW(VPU_IOC_MAGIC, 3, unsigned long)
 #define VPU_IOC_GET_REG                     _IOW(VPU_IOC_MAGIC, 4, unsigned long)
 #define VPU_IOC_PROBE_IOMMU_STATUS          _IOR(VPU_IOC_MAGIC, 5, unsigned long)
+#define VPU_IOC_ATTACH_BUF                  _IOW(VPU_IOC_MAGIC, 6, unsigned long)
+#define VPU_IOC_DETACH_BUF                  _IOW(VPU_IOC_MAGIC, 7, unsigned long)
 
 typedef struct VPUReq {
     RK_U32 *req;
@@ -53,6 +55,24 @@ static const char *name_rkvenc = "/dev/rkvenc";
 static const char *name_hevc_service = "/dev/hevc-service";
 static const char *name_vpu_service = "/dev/vpu-service";
 
+static int cur_client = -1;
+
+int VPUClientGetCur()
+{
+    return cur_client;
+}
+
+void VPUClientAttachBuf(int fd)
+{
+    if (cur_client != -1)
+        ioctl(cur_client, VPU_IOC_ATTACH_BUF, fd);
+}
+
+void VPUClientDetachBuf(int fd)
+{
+    if (cur_client != -1)
+        ioctl(cur_client, VPU_IOC_DETACH_BUF, fd);
+}
 
 int VPUClientInit(VPU_CLIENT_TYPE type)
 {
@@ -102,6 +122,8 @@ int VPUClientInit(VPU_CLIENT_TYPE type)
         mpp_err_f("ioctl VPU_IOC_SET_CLIENT_TYPE failed ret %d errno %d\n", ret, errno);
         return -2;
     }
+    cur_client = fd;
+
     return fd;
 }
 
@@ -110,6 +132,7 @@ RK_S32 VPUClientRelease(int socket)
     VPU_SERVICE_TEST;
     int fd = socket;
     if (fd > 0) {
+        cur_client = -1;
         close(fd);
     }
     return VPU_SUCCESS;
@@ -200,7 +223,7 @@ RK_U32 VPUCheckSupportWidth()
         }
         close(fd);
         fd = -1;
-		(void) fd;
+        (void) fd;
     }
     return hwCfg.maxDecPicWidth;
 }
