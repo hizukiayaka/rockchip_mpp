@@ -21,13 +21,12 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "vpu_api.h"
 #include "rk_type.h"
 #include "mpp_err.h"
 #include "mpp_mem.h"
-#include "vpu.h"
 #include "mpp_time.h"
 
+#include "vpu.h"
 
 #include "h264d_log.h"
 #include "hal_h264d_global.h"
@@ -201,7 +200,7 @@ static RK_U32 rkv_ver_align(RK_U32 val)
 
 static RK_U32 rkv_hor_align(RK_U32 val)
 {
-    return MPP_ALIGN(val, 16);
+    return (MPP_ALIGN(val, 256) | 256);
 }
 
 static RK_U32 rkv_len_align(RK_U32 val)
@@ -403,7 +402,6 @@ MPP_RET rkv_h264d_start(void *hal, HalTaskInfo *task)
 #ifdef RKPLATFORM
     if (VPUClientSendReg(p_hal->vpu_socket, (RK_U32 *)p_regs, DEC_RKV_REGISTERS)) {
         ret =  MPP_ERR_VPUHW;
-		(void) ret;
         H264D_ERR("H264 RKV FlushRegs fail. \n");
     }
 #endif
@@ -541,8 +539,9 @@ MPP_RET rkv_h264d_control(void *hal, RK_S32 cmd_type, void *param)
     FunctionIn(p_hal->logctx.parr[RUN_HAL]);
     switch ((MpiCmd)cmd_type) {
     case MPP_DEC_SET_FRAME_INFO: {
-        VPU_GENERIC *p = (VPU_GENERIC *)param;
-        if (p->CodecType == MPP_FMT_YUV422SP) {
+        MppFrameFormat fmt = mpp_frame_get_fmt((MppFrame)param);
+
+        if (fmt == MPP_FMT_YUV422SP) {
             mpp_slots_set_prop(p_hal->frame_slots, SLOTS_LEN_ALIGN, rkv_len_align_422);
             mpp_log_f("control format YUV422SP \n");
         }
@@ -554,9 +553,6 @@ MPP_RET rkv_h264d_control(void *hal, RK_S32 cmd_type, void *param)
     }
 
     FunctionOut(p_hal->logctx.parr[RUN_HAL]);
-    (void)hal;
-    (void)cmd_type;
-    (void)param;
 __RETURN:
     return ret = MPP_OK;
 }

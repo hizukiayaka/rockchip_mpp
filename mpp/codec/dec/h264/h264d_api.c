@@ -1,19 +1,19 @@
 /*
-*
-* Copyright 2015 Rockchip Electronics Co. LTD
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ *
+ * Copyright 2015 Rockchip Electronics Co. LTD
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 #define MODULE_TAG "h264d_api"
 
@@ -34,6 +34,7 @@
 #include "h264d_slice.h"
 #include "h264d_dpb.h"
 #include "h264d_init.h"
+#include "../../../hal/inc/mpp_hal.h"
 
 static void close_log_files(LogEnv_t *env)
 {
@@ -145,6 +146,7 @@ static MPP_RET free_input_ctx(H264dInputCtx_t *p_Inp)
 __RETURN:
     return ret = MPP_OK;
 }
+
 static MPP_RET init_input_ctx(H264dInputCtx_t *p_Inp, ParserCfg *init)
 {
     MPP_RET ret = MPP_ERR_UNKNOW;
@@ -168,7 +170,6 @@ __FAILED:
     return ret;
 }
 
-
 static MPP_RET free_cur_ctx(H264dCurCtx_t *p_Cur)
 {
     RK_U32 i = 0;
@@ -188,6 +189,7 @@ static MPP_RET free_cur_ctx(H264dCurCtx_t *p_Cur)
 __RETURN:
     return ret = MPP_OK;
 }
+
 static MPP_RET init_cur_ctx(H264dCurCtx_t *p_Cur)
 {
     RK_U32 i = 0;
@@ -221,7 +223,6 @@ __FAILED:
     return ret;
 }
 
-
 static MPP_RET free_vid_ctx(H264dVideoCtx_t *p_Vid)
 {
     RK_U32 i = 0;
@@ -244,6 +245,7 @@ static MPP_RET free_vid_ctx(H264dVideoCtx_t *p_Vid)
 __RETURN:
     return ret = MPP_OK;
 }
+
 static MPP_RET init_vid_ctx(H264dVideoCtx_t *p_Vid)
 {
     RK_U32 i = 0;
@@ -343,6 +345,7 @@ static MPP_RET free_dec_ctx(H264_DecCtx_t *p_Dec)
 __RETURN:
     return ret = MPP_OK;
 }
+
 static MPP_RET init_dec_ctx(H264_DecCtx_t *p_Dec)
 {
     RK_U32 i = 0;
@@ -386,15 +389,12 @@ __FAILED:
     return ret;
 }
 
-
-
 /*!
 ***********************************************************************
 * \brief
 *   alloc all buffer
 ***********************************************************************
 */
-
 MPP_RET h264d_init(void *decoder, ParserCfg *init)
 {
     MPP_RET ret = MPP_ERR_UNKNOW;
@@ -464,6 +464,7 @@ MPP_RET h264d_deinit(void *decoder)
 __RETURN:
     return ret = MPP_OK;
 }
+
 /*!
 ***********************************************************************
 * \brief
@@ -601,7 +602,6 @@ __RETURN:
     return ret = MPP_OK;
 }
 
-
 /*!
 ***********************************************************************
 * \brief
@@ -691,7 +691,6 @@ __FAILED:
     return ret;
 }
 
-
 /*!
 ***********************************************************************
 * \brief
@@ -772,13 +771,6 @@ __FAILED: {
 *   callback
 ***********************************************************************
 */
-typedef enum MppHalHardType_e {
-    HAL_VDPU1,
-    HAL_VDPU,           //!< vpu combined decoder
-    HAL_VEPU,           //!< vpu combined encoder
-    HAL_RKVDEC,         //!< rock-chip h264 h265 vp9 combined decoder
-    HAL_DEVICE_BUTT,
-} HalDeviceId;
 MPP_RET h264d_callback(void *decoder, void *errinfo)
 {
     MPP_RET ret = MPP_ERR_UNKNOW;
@@ -818,13 +810,13 @@ __RETURN:
     FunctionOut(p_Dec->logctx.parr[RUN_PARSE]);
     return ret = MPP_OK;
 }
+
 /*!
 ***********************************************************************
 * \brief
 *   api struct interface
 ***********************************************************************
 */
-
 const ParserApi api_h264d_parser = {
     "h264d_parse",
     MPP_VIDEO_CodingAVC,
@@ -839,3 +831,4 @@ const ParserApi api_h264d_parser = {
     h264d_control,
     h264d_callback,
 };
+

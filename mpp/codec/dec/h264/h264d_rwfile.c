@@ -103,7 +103,6 @@ static void display_input_cmd(RK_S32 argc, char *argv[])
     pnamecmd = strrchr(argv[0], '/');
     pnamecmd = pnamecmd ? pnamecmd  : (strrchr(argv[0], '\\')) ;
     pnamecmd = pnamecmd ? strcat(strcmd, pnamecmd + 1) : argv[0];
-	(void) pnamecmd;
     for (nn = 0; nn < argc; nn++) {
         strcat(strcmd, " ");
         strcat(strcmd, argv[nn]);
@@ -229,13 +228,10 @@ static MPP_RET parse_content(InputParams *p_in, RK_U8 *p)
     //===== read syntax
     for (i = 0; i < item; i += 3) {
         if (!strncmp((const char*)items[i], "InputFile", 9)) {
-			mpp_assert(items[i + 2] != NULL);
             strncpy((char *)p_in->infile_name, (const char*)items[i + 2], strlen((const char*)items[i + 2]) + 1);
         } else if (!strncmp((const char*)items[i], "GoldenDataPath", 14)) {
-	        mpp_assert(items[i + 2] != NULL);
             strncpy((char *)p_in->cmp_path_dir, (const char*)items[i + 2], strlen((const char*)items[i + 2]) + 1);
         } else if (!strncmp((const char*)items[i], "OutputDataPath", 14)) {
-        	mpp_assert(items[i + 2] != NULL);
             strncpy((char *)p_in->out_path_dir, (const char*)items[i + 2], strlen((const char*)items[i + 2]) + 1);
         } else if (!strncmp((const char*)items[i], "DecodedFrames", 13)) {
             if (!sscanf((const char*)items[i + 2], "%d", &p_in->iDecFrmNum)) {

@@ -41,7 +41,6 @@ static MPP_RET ref_pic_list_mvc_modification(H264_SLICE_t *currSlice)
             do {
                 if (i >= size) {
                     ret = MPP_NOK;
-					(void) ret;
                     H264D_WARNNING("ref_pic_list_reordering error, i >= num_ref_idx_active[LIST_0](%d)", size);
                     goto __BITREAD_ERR;
                 }
@@ -68,7 +67,6 @@ static MPP_RET ref_pic_list_mvc_modification(H264_SLICE_t *currSlice)
             do {
                 if (i >= size) {
                     ret = MPP_NOK;
-					(void) ret;
                     H264D_WARNNING("ref_pic_list_reordering error, i >= num_ref_idx_active[LIST_1](%d)", size);
                     goto __BITREAD_ERR;
                 }

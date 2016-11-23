@@ -45,12 +45,6 @@ static RK_U32 vdpu_hor_align(RK_U32 val)
     return MPP_ALIGN(val, 16);
 }
 
-static RK_U32 vdpu_len_align(RK_U32 val)
-{
-    return (2 * MPP_ALIGN(val, 16));
-}
-
-
 static MPP_RET vdpu_set_device_regs(H264dHalCtx_t *p_hal, H264dVdpuRegs_t *p_reg)
 {
     MPP_RET ret = MPP_ERR_UNKNOW;
@@ -332,7 +326,7 @@ MPP_RET vdpu_h264d_init(void *hal, MppHalCfg *cfg)
     FUN_CHECK(ret = vdpu_set_device_regs(p_hal, (H264dVdpuRegs_t *)p_hal->regs));
     mpp_slots_set_prop(p_hal->frame_slots, SLOTS_HOR_ALIGN, vdpu_hor_align);
     mpp_slots_set_prop(p_hal->frame_slots, SLOTS_VER_ALIGN, vdpu_ver_align);
-    mpp_slots_set_prop(p_hal->frame_slots, SLOTS_LEN_ALIGN, vdpu_len_align);
+    mpp_slots_set_prop(p_hal->frame_slots, SLOTS_LEN_ALIGN, NULL);
     p_hal->iDecodedNum = 0;
 
     (void)cfg;
@@ -431,7 +425,6 @@ MPP_RET vdpu_h264d_start(void *hal, HalTaskInfo *task)
 #ifdef RKPLATFORM
     if (VPUClientSendReg(p_hal->vpu_socket, (RK_U32 *)p_hal->regs, DEC_VDPU_REGISTERS)) {
         ret =  MPP_ERR_VPUHW;
-		(void) ret;
         mpp_err_f("H264 VDPU FlushRegs fail, pid=%d, hal_frame_no=%d. \n", getpid(), p_hal->iDecodedNum);
     } else {
         H264D_LOG("H264 VDPU FlushRegs success, pid=%d, hal_frame_no=%d. \n", getpid(), p_hal->iDecodedNum);

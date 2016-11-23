@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2010 Rockchip Electronics S.LSI Co. LTD
  *
@@ -498,7 +497,6 @@ static MPP_RET vdpu1_set_refer_pic_base_addr(H264dVdpu1Regs_t *p_regs, RK_U32 i,
 *    set picture parameter and set register
 ***********************************************************************
 */
-//extern "C"
 MPP_RET vdpu1_set_pic_regs(H264dHalCtx_t *p_hal, H264dVdpu1Regs_t *p_regs)
 {
     MPP_RET ret = MPP_ERR_UNKNOW;
@@ -515,7 +513,6 @@ MPP_RET vdpu1_set_pic_regs(H264dHalCtx_t *p_hal, H264dVdpu1Regs_t *p_regs)
 *    set vlc register
 ***********************************************************************
 */
-//extern "C"
 MPP_RET vdpu1_set_vlc_regs(H264dHalCtx_t *p_hal, H264dVdpu1Regs_t *p_regs)
 {
     RK_U32 i = 0;
@@ -645,7 +642,6 @@ MPP_RET vdpu1_set_vlc_regs(H264dHalCtx_t *p_hal, H264dVdpu1Regs_t *p_regs)
 *    set vlc reference
 ***********************************************************************
 */
-//extern "C"
 MPP_RET vdpu1_set_ref_regs(H264dHalCtx_t *p_hal, H264dVdpu1Regs_t *p_regs)
 {
     RK_U32 i = 0, j = 0;
@@ -701,7 +697,6 @@ MPP_RET vdpu1_set_ref_regs(H264dHalCtx_t *p_hal, H264dVdpu1Regs_t *p_regs)
 *    run Asic
 ***********************************************************************
 */
-//extern "C"
 MPP_RET vdpu1_set_asic_regs(H264dHalCtx_t *p_hal, H264dVdpu1Regs_t *p_regs)
 {
     RK_U32 i = 0, j = 0;
@@ -851,5 +846,4 @@ MPP_RET vdpu1_set_asic_regs(H264dHalCtx_t *p_hal, H264dVdpu1Regs_t *p_regs)
     FunctionOut(p_hal->logctx.parr[RUN_HAL]);
     return ret = MPP_OK;
 }
-
 
