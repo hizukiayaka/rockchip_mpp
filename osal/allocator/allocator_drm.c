@@ -26,6 +26,8 @@
 #include <linux/drm.h>
 #include <linux/drm_mode.h>
 
+#include "vpu.h"
+
 #include "os_mem.h"
 #include "allocator_drm.h"
 
@@ -51,9 +53,9 @@ static int drm_ioctl(int fd, int req, void *arg)
         ret = ioctl(fd, req, arg);
     } while (ret == -1 && (errno == EINTR || errno == EAGAIN));
 
-    if(ret)
-    	drm_dbg(DRM_FUNCTION, "drm_ioctl %x with code %d: %s", req, 
-			ret, strerror(errno));
+    if (ret)
+        drm_dbg(DRM_FUNCTION, "drm_ioctl %x with code %d: %s", req,
+                ret, strerror(errno));
     return ret;
 }
 
@@ -278,6 +280,7 @@ MPP_RET os_allocator_drm_import(void *ctx, MppBufferInfo *data)
     MPP_RET ret = MPP_OK;
     allocator_ctx_drm *p = (allocator_ctx_drm *)ctx;
     struct drm_mode_map_dumb dmmd;
+
     memset(&dmmd, 0, sizeof(dmmd));
 
     drm_dbg(DRM_FUNCTION, "enter");
@@ -303,6 +306,8 @@ MPP_RET os_allocator_drm_import(void *ctx, MppBufferInfo *data)
         return -errno;
     }
 
+    VPUClientAttachBuf(data->fd);
+
     drm_dbg(DRM_FUNCTION, "leave");
 
     return ret;
@@ -311,6 +316,9 @@ MPP_RET os_allocator_drm_import(void *ctx, MppBufferInfo *data)
 MPP_RET os_allocator_drm_release(void *ctx, MppBufferInfo *data)
 {
     (void)ctx;
+
+    VPUClientDetachBuf(data->fd);
+
     munmap(data->ptr, data->size);
     close(data->fd);
     return MPP_OK;
