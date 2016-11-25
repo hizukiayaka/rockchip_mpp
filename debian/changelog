@@ -1,4 +1,24 @@
-mpp (1.2.0-2) testing; urgency=medium
+mpp (1.2.1-1) testing; urgency=medium
+
+  [ Randy Li ]
+  * mpp: legacy: add a new interface to import vpumem
+  * mpp: legacy: fix memory allocation alignment
+  * build: add debian rules
+  * header: add defined used by gstreamer plugin
+
+  [ Jung Zhao ]
+  * allocator: drm: attach/detach large buffer at first/last
+
+  [ timkingh.huang ]
+  * [h264d]: add hal for vpu1
+  * [h264d]: sync code from gerrit_mpp_develop
+
+  [ Randy Li ]
+  * osal: allocator: disable the drm default debug information
+
+ -- Randy Li <randy.li@rock-chips.com>  Fri, 25 Nov 2016 07:50:28 +0000
+
+mpp (1.2.0-3) testing; urgency=medium
 
   * [mpp]: a fixup for wrong place scope symbols
   * .gitignore: the intial version of gitignore
@@ -11,11 +31,9 @@ mpp (1.2.0-2) testing; urgency=medium
   * osal: rename the directory of windows implementation
   * osal: build: update the build system
   * osal: build: use system default thread library
-  * osal test fixup
   * osal: build: test: do not install unit test
   * mpp: move header files into header directory
   * mpp: test: build: rename the mpp library name in unit test
-  * mpp: test: build: renmae
   * mpp: legacy: rename mpp legacy library as rockchip_vpu
   * mpp: build: update build rules
   * build: a simple build rules
