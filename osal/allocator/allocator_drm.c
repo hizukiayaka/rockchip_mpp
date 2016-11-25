@@ -36,7 +36,7 @@
 #include "mpp_log.h"
 #include "mpp_common.h"
 
-static RK_U32 drm_debug = 15;
+static RK_U32 drm_debug = 0;
 
 #define DRM_FUNCTION                (0x00000001)
 #define DRM_DEVICE                  (0x00000002)
