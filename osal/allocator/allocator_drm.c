@@ -59,21 +59,10 @@ static int drm_ioctl(int fd, int req, void *arg)
 
 static void* drm_mmap(int fd, size_t len, int prot, int flags, loff_t offset)
 {
-    static unsigned long pagesize_mask = 0;
-
     if (fd < 0)
         return NULL;
 
-    if (!pagesize_mask)
-        pagesize_mask = getpagesize() - 1;
-
-    len = (len + pagesize_mask) & ~pagesize_mask;
-
-    if (offset & 4095) {
-        return NULL;
-    }
-
-    return mmap64(NULL, len, prot, flags, fd, offset);
+    return mmap(NULL, len, prot, flags, fd, offset);
 }
 
 static int drm_handle_to_fd(int fd, RK_U32 handle, int *map_fd, RK_U32 flags)
