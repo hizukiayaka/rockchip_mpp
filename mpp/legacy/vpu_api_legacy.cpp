@@ -208,8 +208,14 @@ RK_S32 VpuApiLegacy::init(VpuCodecContext *ctx, RK_U8 *extraData, RK_U32 extra_s
     vpug.CodecType  = ctx->codecType;
     vpug.ImgWidth   = ctx->width;
     vpug.ImgHeight  = ctx->height;
-    if (MPP_CTX_ENC != type)
+    if (MPP_CTX_ENC != type) {
         control(ctx, VPU_API_SET_DEFAULT_WIDTH_HEIGH, &vpug);
+        ctx->width = vpug.ImgWidth;
+        ctx->height = vpug.ImgHeight;
+        ctx->hor_stride = vpug.ImgHorStride;
+        ctx->ver_stride = vpug.ImgVerStride;
+        ctx->frame_format = vpug.CodecType;
+    }
     if (extraData != NULL) {
         mpp_packet_init(&pkt, extraData, extra_size);
         mpp_packet_set_extra_data(pkt);
@@ -714,41 +720,19 @@ RK_S32 VpuApiLegacy::getDecoderFormat(VpuCodecContext *ctx, DecoderFormat_t *dec
     decoder_format->width = ctx->width;
     decoder_format->height = ctx->height;
     decoder_format->stride = ctx->width;
-    decoder_format->format = VPU_VIDEO_PIXEL_FMT_NV12;
-    decoder_format->frame_size = (decoder_format->width * decoder_format->height * 3) >> 1;
+    decoder_format->frame_size = (decoder_format->width *
+		    decoder_format->height * 3) >> 1;
+    if (MPP_FMT_YUV420SP_10BIT == ctx->frame_format)
+       decoder_format->format = VPU_VIDEO_PIXEL_FMT_P010LE;
+    else
+       decoder_format->format = VPU_VIDEO_PIXEL_FMT_NV12;
 
-    switch (ctx->videoCoding) {
-    case OMX_RK_VIDEO_CodingMPEG2:      /**< AKA: H.262 */
-    case OMX_RK_VIDEO_CodingMPEG4:      /**< MPEG-4 */
-    case OMX_RK_VIDEO_CodingAVC:        /**< H.264/AVC */
-    case OMX_RK_VIDEO_CodingVP8:                     /**< VP8 */
-    case OMX_RK_VIDEO_CodingH263:
-        decoder_format->aligned_width = (decoder_format->width + 15) & (~15);
-        //printf("decoder_format->aligned_width %d\n", decoder_format->aligned_width);
-        decoder_format->aligned_height = (decoder_format->height + 15) & (~15);
-        decoder_format->aligned_stride = decoder_format->aligned_width;
-        decoder_format->aligned_frame_size = (decoder_format->aligned_width * decoder_format->aligned_height * 3) >> 1;
-        break;
-    case OMX_RK_VIDEO_CodingHEVC:        /**< H.265/HEVC */
-#if 0
-#ifdef SOFIA_3GR_LINUX
-        decoder_format->aligned_width = (decoder_format->width + 63) & (~63);
-        decoder_format->aligned_height = (decoder_format->height + 7) & (~7);
-#else
-        decoder_format->aligned_width = ((decoder_format->width + 255) & (~255)) | 256;
-        decoder_format->aligned_height = (decoder_format->height + 7) & (~7);
-#endif
-#endif
-        decoder_format->aligned_width = ((decoder_format->width + 255) & (~255)) | 256;
-        decoder_format->aligned_height = (decoder_format->height + 7) & (~7);
+    decoder_format->aligned_width = ctx->hor_stride;
+    decoder_format->aligned_height = ctx->ver_stride;
+    decoder_format->aligned_stride = ctx->hor_stride;
 
-        decoder_format->aligned_stride = decoder_format->aligned_width;
-        decoder_format->aligned_frame_size = (decoder_format->aligned_width * decoder_format->aligned_height * 3) >> 1;
-        break;
-    default:
-        ret = -1;
-        break;
-    }
+    decoder_format->aligned_frame_size = (decoder_format->aligned_width *
+		    decoder_format->aligned_height * 3) >> 1;
 
     return ret;
 }

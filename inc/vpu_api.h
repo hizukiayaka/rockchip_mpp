@@ -256,7 +256,8 @@ typedef enum OMX_RK_VIDEO_CODINGTYPE {
 } OMX_RK_VIDEO_CODINGTYPE;
 
 typedef enum VPU_VIDEO_PIXEL_FMT {
-    VPU_VIDEO_PIXEL_FMT_NV12
+    VPU_VIDEO_PIXEL_FMT_NV12,
+    VPU_VIDEO_PIXEL_FMT_P010LE,
 } VPU_VIDEO_PIXEL_FMT;
 
 typedef enum CODEC_TYPE {
@@ -336,6 +337,9 @@ typedef struct VpuCodecContext {
     RK_U32 height;
     void  *extradata;
     RK_S32 extradata_size;
+    RK_U32 hor_stride;
+    RK_U32 ver_stride;
+    RK_U32 frame_format;
 
     RK_U8  enableparsing;
 
