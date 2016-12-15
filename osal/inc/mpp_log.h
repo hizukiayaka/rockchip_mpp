@@ -90,7 +90,9 @@
  */
 
 #define mpp_abort() do {                \
-	abort();                        	\
+	if (mpp_debug & MPP_ABORT) {	\
+		abort();		\
+	}				\
 } while (0)
 
 #define MPP_STRINGS(x)      MPP_TO_STRING(x)
