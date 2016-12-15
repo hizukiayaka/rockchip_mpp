@@ -1,3 +1,14 @@
+mpp (1.2.2-1) testing; urgency=medium
+
+  * Revert "allocator: drm: attach/detach large buffer at first/last"
+  * osal: allocator: make drm_mmap() more simple
+  * mpp: legacy: expend VpuCodecContext to store more information
+  * mpp: codec: remove explicit debug information in h265
+  * [mpp_buffer]: fix issue of destroy external commit frame buffer group twice
+  * osal: debug: put the mpp_abort() default disable
+
+ -- Randy Li <randy.li@rock-chips.com>  Thu, 15 Dec 2016 03:03:09 +0000
+
 mpp (1.2.1-1) testing; urgency=medium
 
   [ Randy Li ]

@@ -1,0 +1,10 @@
+*.debhelper.log
+*.substvars
+files
+debhelper-build-stamp
+librockchip-mpp-dev
+librockchip-mpp-static
+librockchip-mpp1
+librockchip-vpu0
+source
+tmp

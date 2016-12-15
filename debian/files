@@ -1,7 +1,0 @@
-librockchip-mpp-dev_1.2.0-3_armhf.deb libdevel optional
-librockchip-mpp-static_1.2.0-3_armhf.deb libs optional
-librockchip-mpp1-dbgsym_1.2.0-3_armhf.deb debug extra
-librockchip-mpp1_1.2.0-3_armhf.deb libs optional
-librockchip-vpu0-dbgsym_1.2.0-3_armhf.deb debug extra
-librockchip-vpu0_1.2.0-3_armhf.deb libs optional
-mpp_1.2.0-3_20161125T073534z-1fc407c9.buildinfo libs optional
