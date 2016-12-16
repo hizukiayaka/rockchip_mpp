@@ -609,7 +609,8 @@ MPP_RET Mpp::control_dec(MpiCmd cmd, MppParam param)
 	    mExternalFrameGroup = 1;
             ret = mpp_buffer_group_set_listener((MppBufferGroupImpl *)param,
 			    (void *)mThreadCodec);
-            mThreadCodec->signal();
+            if (mThreadCodec)
+                mThreadCodec->signal();
         } else {
             mExternalFrameGroup = 0;
             ret = mpp_buffer_group_set_listener(NULL, (void *)mThreadCodec);
