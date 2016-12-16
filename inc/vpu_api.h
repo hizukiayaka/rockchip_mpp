@@ -125,7 +125,8 @@ typedef struct tVPU_FRAME {
     RK_U32              employ_cnt;
     VPUMemLinear_t      vpumem;
     struct tVPU_FRAME  *next_frame;
-    RK_U32              Res[4];
+    RK_U32              info_change;
+    RK_U32              Res[3];
 } VPU_FRAME;
 
 typedef struct VideoPacket {

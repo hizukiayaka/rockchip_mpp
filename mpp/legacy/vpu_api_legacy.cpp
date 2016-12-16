@@ -337,6 +337,7 @@ RK_S32 VpuApiLegacy:: decode_getoutframe(DecoderOut_t *aDecOut)
         aDecOut->timeUs = pts;
         vframe->ShowTime.TimeHigh = (RK_U32)(pts >> 32);
         vframe->ShowTime.TimeLow = (RK_U32)pts;
+        vframe->info_change = mpp_frame_get_info_change(mframe);
         switch (mpp_frame_get_fmt(mframe)) {
         case MPP_FMT_YUV420SP: {
             vframe->ColorType = VPU_OUTPUT_FORMAT_YUV420_SEMIPLANAR;
