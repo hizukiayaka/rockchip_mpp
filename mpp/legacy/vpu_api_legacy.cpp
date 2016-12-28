@@ -959,6 +959,11 @@ RK_S32 VpuApiLegacy::control(VpuCodecContext *ctx, VPU_API_CMD cmd, void *param)
             p->ImgHorStride = default_align_16(ImgWidth);
             p->ImgVerStride = default_align_16(p->ImgHeight);
         }
+	ctx->width = ImgWidth;
+	ctx->height = p->ImgHeight;
+	ctx->hor_stride = p->ImgHorStride;
+	ctx->ver_stride = p->ImgVerStride;
+	ctx->frame_format = p->CodecType;
 
         break;
     }
