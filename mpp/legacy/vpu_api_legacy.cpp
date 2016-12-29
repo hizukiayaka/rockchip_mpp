@@ -235,6 +235,7 @@ RK_S32 VpuApiLegacy::flush(VpuCodecContext *ctx)
     if (mpi && mpi->reset && init_ok) {
         mpi->reset(mpp_ctx);
         set_eos = 0;
+        mEosSet = 0;
     }
     vpu_api_dbg_func("leave\n");
     return 0;
@@ -433,6 +434,8 @@ RK_S32 VpuApiLegacy:: decode_getoutframe(DecoderOut_t *aDecOut)
             set_eos = 1;
             if (buf == NULL) {
                 aDecOut->size = 0;
+		mEosSet = 1;
+		ret = VPU_API_EOS_STREAM_REACHED;
             }
         }
 
