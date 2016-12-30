@@ -800,7 +800,7 @@ MPP_RET h264d_callback(void *decoder, void *errinfo)
 
             if (ctx->device_id == HAL_RKVDEC) {
                 H264D_DBG(H264D_DBG_CALLBACK, "[CALLBACK] sw[01]=%08x, sw[45]=%08x, sw[76]=%08x\n", p_regs[1], p_regs[45], p_regs[76]);
-            } else if (ctx->device_id == HAL_VDPU) {
+            } else if (ctx->device_id == HAL_VDPU2) {
 
             }
         }

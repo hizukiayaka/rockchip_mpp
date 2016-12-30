@@ -227,7 +227,7 @@ MPP_RET hal_h264d_init(void *hal, MppHalCfg *cfg)
         p_api->control = rkv_h264d_control;
         vpu_client = VPU_DEC_RKV;
         break;
-    case HAL_VDPU:
+    case HAL_VDPU2:
         p_api->init    = vdpu_h264d_init;
         p_api->deinit  = vdpu_h264d_deinit;
         p_api->reg_gen = vdpu_h264d_gen_regs;

@@ -180,7 +180,7 @@ static MPP_RET decoder_init(H264dTestCtx_t *pctx)
         if (hal_device_id == 1) {
             hal_cfg.device_id = HAL_RKVDEC;
         } else {
-            hal_cfg.device_id = HAL_VDPU;
+            hal_cfg.device_id = HAL_VDPU2;
         }
     }
     hal_cfg.frame_slots = pApi->frame_slots;
