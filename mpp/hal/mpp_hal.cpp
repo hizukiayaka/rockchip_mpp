@@ -16,6 +16,11 @@
 
 #define  MODULE_TAG "mpp_hal"
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <string.h>
+
 #include "mpp_mem.h"
 #include "mpp_log.h"
 #include "mpp_time.h"
@@ -40,6 +45,20 @@
 #include "hal_dummy_dec_api.h"
 #include "hal_dummy_enc_api.h"
 
+typedef struct {
+	HalDeviceId hal_id;
+	const char *compatible;
+} platform_vpu_desc;
+
+static const platform_vpu_desc mpp_vpu_platforms[] = {
+	{.hal_id = HAL_VDPU1, .compatible = "rk3288"},
+	{.hal_id = HAL_VDPU2, .compatible = "rk3399"},
+	{.hal_id = HAL_VDPU2, .compatible = "rk3328"},
+};
+
+#define MPP_VPU_PLATFORM_COUNT \
+		(sizeof(mpp_vpu_platforms)/sizeof(platform_vpu_desc))
+
 /*
  * all hardware api static register here
  */
@@ -52,7 +71,7 @@ static const MppHalApi *hw_apis[] = {
     &hal_api_mpg4d,
     &hal_api_vp8d,
     &hal_api_vp9d,
-	&hal_api_jpegd,
+    &hal_api_jpegd,
     &hal_api_h264e,	
     &hal_api_dummy_dec,
     &hal_api_dummy_enc,
@@ -205,3 +224,35 @@ MPP_RET mpp_hal_control(MppHal ctx, RK_S32 cmd, void *param)
     return p->api->control(p->ctx, cmd, param);
 }
 
+HalDeviceId mpp_hal_get_vpu_version()
+{
+    static HalDeviceId hal_id = HAL_INVALID;
+    int32_t fd = -1;
+    char temp[256];
+    uint32_t i;
+
+    if (hal_id != HAL_INVALID)
+        return hal_id;
+    
+    fd = open ("/proc/device-tree/compatible", O_RDONLY);
+    if (fd < 0) {
+	/* Assume those kernel without dts supporting use VDPU1 */
+        hal_id = HAL_VDPU1;
+	return HAL_VDPU1;
+    }
+    if (read (fd, temp, sizeof(temp) -1) > 0) {
+        for (i = 0; i < MPP_VPU_PLATFORM_COUNT; i++) {
+	   if (strstr (temp, mpp_vpu_platforms[i].compatible))
+	   {
+               hal_id = mpp_vpu_platforms[i].hal_id;
+	       return hal_id;
+	   }
+	}
+    }
+    /*
+     * No platform match, maybe not be recorded in the list, assume it
+     * use VDPU1
+     */
+    hal_id = HAL_VDPU1;
+    return HAL_VDPU1;
+}

@@ -34,6 +34,7 @@ typedef enum MppHalHardType_e {
     HAL_RKVDEC,         //!< rock-chip h264 h265 vp9 combined decoder
     HAL_RKVENC,         //!< rock-chip h264 h265 combined encoder
     HAL_DEVICE_BUTT,
+    HAL_INVALID = 0xffff, /* Used for initialize variable safely */
 } HalDeviceId;
 
 
@@ -95,6 +96,7 @@ MPP_RET mpp_hal_reset(MppHal ctx);
 MPP_RET mpp_hal_flush(MppHal ctx);
 MPP_RET mpp_hal_control(MppHal ctx, RK_S32 cmd, void *param);
 
+HalDeviceId mpp_hal_get_vpu_version();
 #ifdef __cplusplus
 }
 #endif
