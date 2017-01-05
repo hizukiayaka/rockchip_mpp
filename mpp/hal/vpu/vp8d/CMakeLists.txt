@@ -10,6 +10,7 @@ set(HAL_VP8D_API
     
 # hal vp8 header   
 set(HAL_VP8D_HDR
+	hal_vp8d_base.h
 	hal_vp8d_reg.h
     ) 
     
