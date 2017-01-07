@@ -193,22 +193,6 @@ RK_S32 VPUClientGetIOMMUStatus()
 #define RKV_MODE  (0x1)
 #define VDPU_MODE (0x2)
 
-static int detect_vpu_version () {
-	int fd = -1;
-	char *temp[256];
-	fd = open ("/proc/device-tree/compatible", O_RDONLY);
-	if (fd < 0)
-		return fd;
-	if (read (fd, temp, sizeof(temp) -1) > 0) {
-		if (strstr (temp, "rk3288"))
-			return HAL_VDPU1;
-		if (strstr (temp, "rk3399"))
-			return HAL_VDPU2;
-	}
-	close (fd);
-	return -1;
-}
-
 MPP_RET hal_h264d_init(void *hal, MppHalCfg *cfg)
 {
     MppHalApi *p_api = NULL;
@@ -232,7 +216,7 @@ MPP_RET hal_h264d_init(void *hal, MppHalCfg *cfg)
         mpp_env_get_u32("use_mpp_mode", &mode, 0);
         value = (!!access("/dev/rkvdec", F_OK));
 	/* Force the VDPU1 mode */
-        cfg->device_id = detect_vpu_version();
+        cfg->device_id = mpp_hal_get_vpu_version();
     }
 #endif
     switch (cfg->device_id) {
