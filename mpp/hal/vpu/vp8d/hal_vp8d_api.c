@@ -21,6 +21,7 @@
 #include "mpp_hal.h"
 #include "hal_vp8d_base.h"
 #include "hal_vp8d_reg.h"
+#include "hal_vp8d_vdpu1_reg.h"
 
 RK_U32 vp8h_debug = 0;
 
@@ -34,6 +35,7 @@ MPP_RET hal_vp8d_init (void *hal, MppHalCfg *cfg)
 	memset(self, 0, sizeof(VP8DHalContext_t));
 
 	p_api = &self->hal_api;
+	cfg->device_id = mpp_hal_get_vpu_version();
 
 	switch (cfg->device_id) {
 	case HAL_VDPU2:
@@ -45,6 +47,16 @@ MPP_RET hal_vp8d_init (void *hal, MppHalCfg *cfg)
 		p_api->reset = hal_vp8d_vdpu2_reset;
 		p_api->flush = hal_vp8d_vdpu2_flush;
 		p_api->control = hal_vp8d_vdpu2_control;
+		break;
+	case HAL_VDPU1:
+		p_api->init = hal_vp8d_vdpu1_init;
+		p_api->deinit = hal_vp8d_vdpu1_deinit;
+		p_api->reg_gen = hal_vp8d_vdpu1_gen_regs;
+		p_api->start = hal_vp8d_vdpu1_start;
+		p_api->wait = hal_vp8d_vdpu1_wait;
+		p_api->reset = hal_vp8d_vdpu1_reset;
+		p_api->flush = hal_vp8d_vdpu1_flush;
+		p_api->control = hal_vp8d_vdpu1_control;
 		break;
 	default:
 		return MPP_ERR_INIT;
