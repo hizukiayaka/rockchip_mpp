@@ -23,6 +23,9 @@
 #include "hal_h264e.h"
 #include "hal_h264e_vpu.h"
 
+typedef struct h264e_vpu_reg_set_t {
+    RK_U32 val[VEPU_H264E_NUM_REGS];
+} h264e_vpu_reg_set;
 
 /* H.264 motion estimation parameters */
 static const RK_U32 h264_prev_mode_favor[52] = {
@@ -1203,8 +1206,9 @@ static MPP_RET hal_h264e_vpu_stream_buffer_init(h264e_hal_vpu_stream *strmbuf, R
 }
 
 
-void hal_h264e_vpu_stream_put_bits(h264e_hal_vpu_stream *buffer, RK_S32 value, RK_S32 number,
-                                   const char *name)
+static void
+hal_h264e_vpu_stream_put_bits(h264e_hal_vpu_stream *buffer, RK_S32 value,
+		              RK_S32 number, const char *name)
 {
     RK_S32 bits;
     RK_U32 byte_buffer = buffer->byte_buffer;
@@ -1238,7 +1242,9 @@ void hal_h264e_vpu_stream_put_bits(h264e_hal_vpu_stream *buffer, RK_S32 value, R
     return;
 }
 
-void hal_h264e_vpu_stream_put_bits_with_detect(h264e_hal_vpu_stream * buffer, RK_S32 value, RK_S32 number, const char *name)
+static void
+hal_h264e_vpu_stream_put_bits_with_detect
+(h264e_hal_vpu_stream * buffer, RK_S32 value, RK_S32 number, const char *name)
 {
     RK_S32 bits;
     RK_U8 *stream = buffer->stream;
@@ -1288,11 +1294,13 @@ void hal_h264e_vpu_stream_put_bits_with_detect(h264e_hal_vpu_stream * buffer, RK
 }
 
 
-void hal_h264e_vpu_rbsp_trailing_bits(h264e_hal_vpu_stream * stream)
+static void
+hal_h264e_vpu_rbsp_trailing_bits(h264e_hal_vpu_stream * stream)
 {
     hal_h264e_vpu_stream_put_bits_with_detect(stream, 1, 1, "rbsp_stop_one_bit");
     if (stream->buffered_bits > 0) {
-        hal_h264e_vpu_stream_put_bits_with_detect(stream, 0, 8 - stream->buffered_bits, "bsp_alignment_zero_bit(s)");
+        hal_h264e_vpu_stream_put_bits_with_detect(stream, 0,
+			8 - stream->buffered_bits, "bsp_alignment_zero_bit(s)");
     }
 }
 
@@ -1328,7 +1336,8 @@ static void hal_h264e_vpu_write_ue(h264e_hal_vpu_stream *fifo, RK_U32 val,
     }
 }
 
-static void hal_h264e_vpu_write_se(h264e_hal_vpu_stream *fifo, RK_S32 val, const char *name)
+static void
+hal_h264e_vpu_write_se(h264e_hal_vpu_stream *fifo, RK_S32 val, const char *name)
 {
     RK_U32 tmp;
 
@@ -1340,7 +1349,8 @@ static void hal_h264e_vpu_write_se(h264e_hal_vpu_stream *fifo, RK_S32 val, const
     hal_h264e_vpu_write_ue(fifo, tmp, name);
 }
 
-static MPP_RET hal_h264e_vpu_nal_start(h264e_hal_vpu_stream * stream, RK_S32 nalRefIdc, rkvenc_nal_unit_type nalUnitType)
+static MPP_RET
+hal_h264e_vpu_nal_start(h264e_hal_vpu_stream * stream, RK_S32 nalRefIdc, rkvenc_nal_unit_type nalUnitType)
 {
     hal_h264e_vpu_stream_put_bits(stream, 0,                    8, "leadin_zero_8bits");
     hal_h264e_vpu_stream_put_bits(stream, 0,                    8, "start_code_prefix");
@@ -1354,9 +1364,8 @@ static MPP_RET hal_h264e_vpu_nal_start(h264e_hal_vpu_stream * stream, RK_S32 nal
     return MPP_OK;
 }
 
-
-
-static MPP_RET hal_h264e_vpu_write_sps(h264e_hal_vpu_stream *stream, h264e_hal_sps *sps)
+static MPP_RET
+hal_h264e_vpu_write_sps(h264e_hal_vpu_stream *stream, h264e_hal_sps *sps)
 {
     h264e_hal_debug_enter();
 
@@ -2219,4 +2228,3 @@ MPP_RET hal_h264e_vpu_control(void *hal, RK_S32 cmd_type, void *param)
     h264e_hal_debug_leave();
     return MPP_OK;
 }
-
