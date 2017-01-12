@@ -1372,10 +1372,10 @@ hal_h264e_vpu_write_sps(h264e_hal_vpu_stream *stream, h264e_hal_sps *sps)
     hal_h264e_vpu_nal_start(stream, 1, RKVENC_NAL_SPS);
 
     hal_h264e_vpu_stream_put_bits_with_detect(stream, sps->i_profile_idc, 8, "profile_idc"); //FIXED: 77, 42
-    hal_h264e_vpu_stream_put_bits_with_detect(stream, sps->b_constraint_set0, 1, "constraint_set0_flag"); //E0
-    hal_h264e_vpu_stream_put_bits_with_detect(stream, sps->b_constraint_set1, 1, "constraint_set1_flag");
-    hal_h264e_vpu_stream_put_bits_with_detect(stream, sps->b_constraint_set2, 1, "constraint_set2_flag");
-    hal_h264e_vpu_stream_put_bits_with_detect(stream, sps->b_constraint_set3, 1, "constraint_set3_flag");
+    hal_h264e_vpu_stream_put_bits_with_detect(stream, 0, 1, "constraint_set0_flag"); //E0
+    hal_h264e_vpu_stream_put_bits_with_detect(stream, 0, 1, "constraint_set1_flag");
+    hal_h264e_vpu_stream_put_bits_with_detect(stream, 0, 1, "constraint_set2_flag");
+    hal_h264e_vpu_stream_put_bits_with_detect(stream, 0, 1, "constraint_set3_flag");
 
     hal_h264e_vpu_stream_put_bits_with_detect(stream, 0, 4, "reserved_zero_4bits");
     hal_h264e_vpu_stream_put_bits_with_detect(stream, sps->i_level_idc, 8, "level_idc"); //28
@@ -1564,7 +1564,7 @@ static void hal_h264e_vpu_set_pps(h264e_hal_pps *pps, h264e_control_extra_info_c
 {
     pps->i_id = 0;
     pps->i_sps_id = 0;
-    pps->b_cabac = 0;
+    pps->b_cabac = cfg->enable_cabac;
     pps->b_pic_order = 0;
     pps->i_num_slice_groups = 1;
     pps->i_num_ref_idx_l0_default_active = 1;
