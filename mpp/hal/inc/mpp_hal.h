@@ -96,7 +96,7 @@ MPP_RET mpp_hal_reset(MppHal ctx);
 MPP_RET mpp_hal_flush(MppHal ctx);
 MPP_RET mpp_hal_control(MppHal ctx, RK_S32 cmd, void *param);
 
-HalDeviceId mpp_hal_get_vpu_version();
+HalDeviceId mpp_hal_get_vpu_version(RK_U8 is_encoder);
 #ifdef __cplusplus
 }
 #endif

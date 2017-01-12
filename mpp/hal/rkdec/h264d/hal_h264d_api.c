@@ -216,7 +216,7 @@ MPP_RET hal_h264d_init(void *hal, MppHalCfg *cfg)
         mpp_env_get_u32("use_mpp_mode", &mode, 0);
         value = (!!access("/dev/rkvdec", F_OK));
 	/* Force the VDPU1 mode */
-        cfg->device_id = mpp_hal_get_vpu_version();
+        cfg->device_id = mpp_hal_get_vpu_version(0);
     }
 #endif
     switch (cfg->device_id) {

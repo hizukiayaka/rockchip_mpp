@@ -224,7 +224,7 @@ MPP_RET mpp_hal_control(MppHal ctx, RK_S32 cmd, void *param)
     return p->api->control(p->ctx, cmd, param);
 }
 
-HalDeviceId mpp_hal_get_vpu_version()
+HalDeviceId mpp_hal_get_vpu_version(RK_U8 is_encoder)
 {
     static HalDeviceId hal_id = HAL_INVALID;
     int32_t fd = -1;
@@ -237,14 +237,25 @@ HalDeviceId mpp_hal_get_vpu_version()
     fd = open ("/proc/device-tree/compatible", O_RDONLY);
     if (fd < 0) {
 	/* Assume those kernel without dts supporting use VDPU1 */
-        hal_id = HAL_VDPU1;
-	return HAL_VDPU1;
+        hal_id = is_encoder ? HAL_VEPU1 : HAL_VDPU1;
+	return hal_id;
     }
     if (read (fd, temp, sizeof(temp) -1) > 0) {
         for (i = 0; i < MPP_VPU_PLATFORM_COUNT; i++) {
 	   if (strstr (temp, mpp_vpu_platforms[i].compatible))
 	   {
                hal_id = mpp_vpu_platforms[i].hal_id;
+	       if (is_encoder) {
+		       switch (hal_id)
+		       {
+		       case HAL_VDPU1:
+		           hal_id = HAL_VEPU1;
+			   break;
+		       case HAL_VDPU2:
+		           hal_id = HAL_VEPU;
+			   break;
+		       }
+	       }
 	       return hal_id;
 	   }
 	}
@@ -253,6 +264,6 @@ HalDeviceId mpp_hal_get_vpu_version()
      * No platform match, maybe not be recorded in the list, assume it
      * use VDPU1
      */
-    hal_id = HAL_VDPU1;
-    return HAL_VDPU1;
+    hal_id = is_encoder ? HAL_VEPU1: HAL_VDPU1;
+    return hal_id;
 }

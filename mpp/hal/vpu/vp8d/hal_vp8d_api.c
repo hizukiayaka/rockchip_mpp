@@ -35,7 +35,7 @@ MPP_RET hal_vp8d_init (void *hal, MppHalCfg *cfg)
 	memset(self, 0, sizeof(VP8DHalContext_t));
 
 	p_api = &self->hal_api;
-	cfg->device_id = mpp_hal_get_vpu_version();
+	cfg->device_id = mpp_hal_get_vpu_version(0);
 
 	switch (cfg->device_id) {
 	case HAL_VDPU2:
