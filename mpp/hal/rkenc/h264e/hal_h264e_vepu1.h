@@ -17,10 +17,8 @@
 #ifndef __HAL_H264E_VEPU1_H__
 #define __HAL_H264E_VEPU1_H__
 
-#include "mpp_hal.h"
+#include "hal_h264e_vpu_common.h"
 #include "hal_task.h"
-
-#define BIT(n)  (1<<(n))
 
 /* RK3288 Encoder registers. */
 #define VEPU_REG_INTERRUPT          0x004
@@ -40,8 +38,8 @@
 #define     VEPU_REG_INPUT_SWAP16               BIT(14)
 #define     VEPU_REG_AXI_CTRL_BURST_LEN(x)      (((x) & 0x3f) << 8)
 #define     VEPU_REG_AXI_CTRL_BURST_DISABLE     BIT(7)
-#define     VEPU_REG_AXI_CTRL_INCREMENT_MODE(x) BIT(6) 
-#define     VEPU_REG_AXI_CTRL_BURST_DISCARD(x)  BIT(5)
+#define     VEPU_REG_AXI_CTRL_INCREMENT_MODE    BIT(6) 
+#define     VEPU_REG_AXI_CTRL_BURST_DISCARD     BIT(5)
 #define     VEPU_REG_CLK_GATING_EN              BIT(4)
 #define     VEPU_REG_OUTPUT_SWAP32              BIT(3)
 #define     VEPU_REG_INPUT_SWAP32               BIT(2)
@@ -68,7 +66,7 @@
 #define     VEPU_REG_MB_WIDTH(x)                    (((x) & 0x1ff) << 19)
 #define     VEPU_REG_MB_HEIGHT(x)                   (((x) & 0x1ff) << 10)
 #define     VEPU_REG_RECON_WRITE_DIS                BIT(6)
-#define     VEPU_REG_PIC_TYPE(x)                    (((x) & 0x3) << 4)
+#define     VEPU_REG_PIC_TYPE(x)                    (((x) & 0x3) << 3)
 #define     VEPU_REG_ENCODE_FORMAT(x)               (((x) & 0x3) << 1)
 #define     VEPU_REG_ENCODE_ENABLE                  BIT(0)
 
@@ -121,9 +119,8 @@
 #define VEPU_REG_STR_BUF_LIMIT          0x060
 
 #define VEPU_REG_MAD_CTRL            0x064
-#define     VEPU_REG_MAD_QP_ADJUSTMENT      (((x) & 0xf) << 28)
+#define     VEPU_REG_MAD_QP_ADJUSTMENT(x)   (((x) & 0xf) << 28)
 #define     VEPU_REG_MAD_THRESHOLD(x)       (((x) & 0x3f) << 22)
-#define     VEPU_REG_QP_SUM_DIV2	    (((x) & 0x001fffff) << 0)
 #define     VEPU_REG_QP_SUM(x)              (((x) & 0x001fffff) * 2)
 
 #define VEPU_REG_QP_VAL             0x06c
@@ -144,13 +141,13 @@
 #define     VEPU_REG_CHKPT_WORD_ERR_CHK1(x)     (((x) & 0xffff) << 16)
 
 #define VEPU_REG_CHKPT_DELTA_QP         0x090
-#define     VEPU_REG_CHKPT_DELTA_QP_CHK6(x)     (((x) & 0x0f) << 0)
-#define     VEPU_REG_CHKPT_DELTA_QP_CHK5(x)     (((x) & 0x0f) << 4)
-#define     VEPU_REG_CHKPT_DELTA_QP_CHK4(x)     (((x) & 0x0f) << 8)
+#define     VEPU_REG_CHKPT_DELTA_QP_CHK0(x)     (((x) & 0x0f) << 0)
+#define     VEPU_REG_CHKPT_DELTA_QP_CHK1(x)     (((x) & 0x0f) << 4)
+#define     VEPU_REG_CHKPT_DELTA_QP_CHK2(x)     (((x) & 0x0f) << 8)
 #define     VEPU_REG_CHKPT_DELTA_QP_CHK3(x)     (((x) & 0x0f) << 12)
-#define     VEPU_REG_CHKPT_DELTA_QP_CHK2(x)     (((x) & 0x0f) << 16)
-#define     VEPU_REG_CHKPT_DELTA_QP_CHK1(x)     (((x) & 0x0f) << 20)
-#define     VEPU_REG_CHKPT_DELTA_QP_CHK0(x)     (((x) & 0x0f) << 24)
+#define     VEPU_REG_CHKPT_DELTA_QP_CHK4(x)     (((x) & 0x0f) << 16)
+#define     VEPU_REG_CHKPT_DELTA_QP_CHK5(x)     (((x) & 0x0f) << 20)
+#define     VEPU_REG_CHKPT_DELTA_QP_CHK6(x)     (((x) & 0x0f) << 24)
 
 #define VEPU_REG_RLC_CTRL            0x094
 #define     VEPU_REG_STREAM_START_OFFSET(x) (((x) & 0x3f) << 23)
@@ -168,11 +165,10 @@
 #define     VEPU_REG_STABLE_MIN_VALUE(x)    (((x) & 0xffffff) << 0)
 
 #define VEPU_REG_STABLE_MOTION_SUM      0x0a4
-
 #define VEPU_REG_ADDR_CABAC_TBL         0x0cc
 #define VEPU_REG_ADDR_MV_OUT            0x0d0
 
-#define VEPU_REG_RGB2YUV_CONVERSION_COEF1   0x0dc
+#define VEPU_REG_RGB2YUV_CONVERSION_COEF1   0x0d4
 #define     VEPU_REG_RGB2YUV_CONVERSION_COEFB(x)    (((x) & 0xffff) << 16)
 #define     VEPU_REG_RGB2YUV_CONVERSION_COEFA(x)    (((x) & 0xffff) << 0)
 
@@ -219,17 +215,22 @@
 #define     VEPU_REG_ROI_QP_DELTA_1             (((x) & 0xf) << 4)
 #define     VEPU_REG_ROI_QP_DELTA_2             (((x) & 0xf) << 0)
 
-#define VEPU_REG_DMV_PENALTY_TBL(i)     (0x1E0 + ((i) * 0x4))
+#define VEPU_REG_DMV_PENALTY_TBL(i)     (0x180 + ((i) * 0x4))
 #define     VEPU_REG_DMV_PENALTY_TABLE_BIT(x, i)        (x << i * 8)
 
-#define VEPU_REG_DMV_Q_PIXEL_PENALTY_TBL(i) (0x260 + ((i) * 0x4))
+#define VEPU_REG_DMV_Q_PIXEL_PENALTY_TBL(i) (0x200 + ((i) * 0x4))
 #define     VEPU_REG_DMV_Q_PIXEL_PENALTY_TABLE_BIT(x, i)    (x << i * 8)
 
-#define     VEPU_H264E_NUM_REGS  164
+#define     VEPU_H264E_VEPU1_NUM_REGS  164
 #define     H264E_CABAC_TABLE_BUF_SIZE (52*2*464)
 
-typedef struct h264e_vepu1_reg_set_t {
-    RK_U32 val[VEPU_H264E_NUM_REGS];
-} h264e_vepu1_reg_set;
+MPP_RET hal_h264e_vepu1_init    (void *hal, MppHalCfg *cfg);
+MPP_RET hal_h264e_vepu1_deinit  (void *hal);
+MPP_RET hal_h264e_vepu1_gen_regs(void *hal, HalTaskInfo *task);
+MPP_RET hal_h264e_vepu1_start   (void *hal, HalTaskInfo *task);
+MPP_RET hal_h264e_vepu1_wait    (void *hal, HalTaskInfo *task);
+MPP_RET hal_h264e_vepu1_reset   (void *hal);
+MPP_RET hal_h264e_vepu1_flush   (void *hal);
+MPP_RET hal_h264e_vepu1_control (void *hal, RK_S32 cmd_type, void *param);
 
 #endif
