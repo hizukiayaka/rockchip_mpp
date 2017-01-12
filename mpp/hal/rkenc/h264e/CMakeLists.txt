@@ -12,6 +12,7 @@ set(HAL_H264E_API
 set(HAL_H264E_HDR
 	hal_h264e.h
 	hal_h264e_vpu.h
+	hal_h264e_vepu1.h
 	hal_h264e_rkv.h	
     ) 
     
@@ -19,6 +20,7 @@ set(HAL_H264E_HDR
 set(HAL_H264E_SRC
 	hal_h264e_api.c
 	hal_h264e_vpu.c
+	hal_h264e_vepu1.c
 	hal_h264e_rkv.c
     ) 
     

@@ -25,6 +25,7 @@
 #include "hal_h264e_api.h"
 #include "hal_h264e.h"
 #include "hal_h264e_vpu.h"
+#include "hal_h264e_vepu1.h"
 #include "hal_h264e_rkv.h"
 
 RK_U32 h264e_hal_log_mode = 0;
@@ -38,7 +39,7 @@ MPP_RET hal_h264e_init(void *hal, MppHalCfg *cfg)
     if (!access("/dev/rkvenc", F_OK))
         cfg->device_id = HAL_RKVENC;
     else
-        cfg->device_id = HAL_VEPU;
+        cfg->device_id = mpp_hal_get_vpu_version(1);
 
     switch (cfg->device_id) {
     case HAL_VEPU:
@@ -51,6 +52,16 @@ MPP_RET hal_h264e_init(void *hal, MppHalCfg *cfg)
         api->flush   = hal_h264e_vpu_flush;
         api->control = hal_h264e_vpu_control;
         break;
+    case HAL_VEPU1:
+        api->init    = hal_h264e_vepu1_init;
+        api->deinit  = hal_h264e_vepu1_deinit;
+        api->reg_gen = hal_h264e_vepu1_gen_regs;
+        api->start   = hal_h264e_vepu1_start;
+        api->wait    = hal_h264e_vepu1_wait;
+        api->reset   = hal_h264e_vepu1_reset;
+        api->flush   = hal_h264e_vepu1_flush;
+        api->control = hal_h264e_vepu1_control;
+	break;
     case HAL_RKVENC:
         api->init    = hal_h264e_rkv_init;
         api->deinit  = hal_h264e_rkv_deinit;
@@ -125,21 +136,18 @@ MPP_RET hal_h264e_control(void *hal, RK_S32 cmd_type, void *param)
     return api->control(hal, cmd_type, param);
 }
 
-
 const MppHalApi hal_api_h264e = {
-    "h264e_rkvenc",
-    MPP_CTX_ENC,
-    MPP_VIDEO_CodingAVC,
-    sizeof(h264e_hal_context),
-    0,
-    hal_h264e_init,
-    hal_h264e_deinit,
-    hal_h264e_gen_regs,
-    hal_h264e_start,
-    hal_h264e_wait,
-    hal_h264e_reset,
-    hal_h264e_flush,
-    hal_h264e_control,
+    .name = "h264e_rkvenc",
+    .type = MPP_CTX_ENC,
+    .coding = MPP_VIDEO_CodingAVC,
+    .ctx_size = sizeof(h264e_hal_context),
+    .flag = 0,
+    .init = hal_h264e_init,
+    .deinit = hal_h264e_deinit,
+    .reg_gen = hal_h264e_gen_regs,
+    .start = hal_h264e_start,
+    .wait = hal_h264e_wait,
+    .reset = hal_h264e_reset,
+    .flush = hal_h264e_flush,
+    .control = hal_h264e_control,
 };
-
-
