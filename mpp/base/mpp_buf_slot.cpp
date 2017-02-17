@@ -811,6 +811,7 @@ MPP_RET mpp_buf_slot_set_prop(MppBufSlots slots, RK_S32 index, SlotPropType type
          *    only display info change is need
          */
         generate_info_set(impl, frame, 0);
+#if 0
         if (mpp_frame_info_cmp(impl->info, impl->info_set)) {
             impl->info_changed = 1;
 #ifdef RKPLATFORM
@@ -823,6 +824,7 @@ MPP_RET mpp_buf_slot_set_prop(MppBufSlots slots, RK_S32 index, SlotPropType type
 #endif
             // info change found here
         }
+#endif
     } break;
     case SLOT_BUFFER: {
         MppBuffer buffer = val;
