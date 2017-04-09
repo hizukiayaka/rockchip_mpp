@@ -44,6 +44,7 @@ int pthread_setname_np(pthread_t thread, const char *name);
 #include <unistd.h>
 #include <semaphore.h>
 #include <pthread.h>
+#include <sys/time.h>
 
 #ifndef PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP
 #define PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP PTHREAD_RECURSIVE_MUTEX_INITIALIZER
@@ -166,17 +167,21 @@ inline RK_S32 Condition::wait(Mutex* mutex)
 }
 inline RK_S32 Condition::timedwait(Mutex& mutex, RK_S64 timeout)
 {
-    struct timespec time;
-    time.tv_sec  = (time_t)(timeout >> 32);
-    time.tv_nsec = (long)timeout;
-    return pthread_cond_timedwait(&mCond, &mutex.mMutex, &time);
+    return timedwait(&mutex, timeout);
 }
 inline RK_S32 Condition::timedwait(Mutex* mutex, RK_S64 timeout)
 {
-    struct timespec time;
-    time.tv_sec  = (time_t)(timeout >> 32);
-    time.tv_nsec = (long)timeout;
-    return pthread_cond_timedwait(&mCond, &mutex->mMutex, &time);
+    struct timespec old_ts, ts;
+
+    clock_gettime(CLOCK_REALTIME_COARSE, &old_ts);
+
+    ts.tv_sec = old_ts.tv_sec + timeout / 1000;
+    ts.tv_nsec = old_ts.tv_nsec + (timeout % 1000) * 1000000;
+
+    /* FIXME Detect overflow, not always work */
+    if (ts.tv_nsec < old_ts.tv_nsec)
+        ts.tv_sec++;
+    return pthread_cond_timedwait(&mCond, &mutex->mMutex, &ts);
 }
 inline RK_S32 Condition::signal()
 {
