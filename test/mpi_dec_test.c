@@ -109,6 +109,7 @@ static int decode_simple(MpiDecLoopData *data)
         mpp_packet_set_eos(packet);
 
     do {
+        RK_S32 times = 5;
         // send the packet first if packet is not done
         if (!pkt_done) {
             ret = mpi->decode_put_packet(ctx, packet);
@@ -121,7 +122,16 @@ static int decode_simple(MpiDecLoopData *data)
             RK_S32 get_frm = 0;
             RK_U32 frm_eos = 0;
 
+        try_again:
             ret = mpi->decode_get_frame(ctx, &frame);
+            if (MPP_ERR_TIMEOUT == ret) {
+                if (times > 0) {
+                    times--;
+                    msleep(2);
+                    goto try_again;
+                }
+                mpp_err("decode_get_frame failed too much time\n");
+            }
             if (MPP_OK != ret) {
                 mpp_err("decode_get_frame failed ret %d\n", ret);
                 break;
@@ -353,6 +363,8 @@ int mpi_dec_test_decode(MpiDecTestCmd *cmd)
     MpiCmd mpi_cmd      = MPP_CMD_BASE;
     MppParam param      = NULL;
     RK_U32 need_split   = 1;
+    RK_U32 output_block = MPP_POLL_BLOCK;
+    RK_S64 block_timeout = 5;
 
     // paramter for resource malloc
     RK_U32 width        = cmd->width;
@@ -470,6 +482,20 @@ int mpi_dec_test_decode(MpiDecTestCmd *cmd)
     ret = mpi->control(ctx, mpi_cmd, param);
     if (MPP_OK != ret) {
         mpp_err("mpi->control failed\n");
+        goto MPP_TEST_OUT;
+    }
+
+    param = &output_block;
+    ret = mpi->control(ctx, MPP_SET_OUTPUT_BLOCK, param);
+    if (MPP_OK != ret) {
+        mpp_err("Failed to set blocking mode on MPI (code = %d).\n", ret);
+        goto MPP_TEST_OUT;
+    }
+
+    param = &block_timeout;
+    ret = mpi->control(ctx, MPP_SET_OUTPUT_BLOCK_TIMEOUT, param);
+    if (MPP_OK != ret) {
+        mpp_err("Failed to set blocking mode on MPI (code = %d).\n", ret);
         goto MPP_TEST_OUT;
     }
 
