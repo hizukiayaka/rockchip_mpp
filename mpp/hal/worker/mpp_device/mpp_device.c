@@ -21,6 +21,7 @@
 #include <errno.h>
 #include <string.h>
 #include <unistd.h>
+#include <video/rk_vpu_service.h>
 
 #include "mpp_env.h"
 #include "mpp_log.h"
@@ -33,20 +34,7 @@
 
 #include "vpu.h"
 
-#define VPU_IOC_MAGIC                       'l'
-
-#define VPU_IOC_SET_CLIENT_TYPE             _IOW(VPU_IOC_MAGIC, 1, unsigned long)
-#define VPU_IOC_SET_REG                     _IOW(VPU_IOC_MAGIC, 3, unsigned long)
-#define VPU_IOC_GET_REG                     _IOW(VPU_IOC_MAGIC, 4, unsigned long)
-
-#define VPU_IOC_SET_CLIENT_TYPE_U32         _IOW(VPU_IOC_MAGIC, 1, unsigned int)
-
-#define VPU_IOC_WRITE(nr, size)             _IOC(_IOC_WRITE, VPU_IOC_MAGIC, (nr), (size))
-
-typedef struct MppReq_t {
-    RK_U32 *req;
-    RK_U32  size;
-} MppReq;
+#define VPU_IOC_WRITE(nr, size)    _IOC(_IOC_WRITE, VPU_IOC_MAGIC, (nr), (size))
 
 #define MAX_TIME_RECORD                     4
 
@@ -73,30 +61,10 @@ static RK_U32 mpp_device_debug = 0;
 
 static RK_S32 mpp_device_set_client_type(int dev, RK_S32 client_type)
 {
-    static RK_S32 mpp_device_ioctl_version = -1;
+    RK_U32 cmd = VPU_IOC_SET_CLIENT_TYPE;
     RK_S32 ret;
 
-    if (mpp_device_ioctl_version < 0) {
-        ret = ioctl(dev, VPU_IOC_SET_CLIENT_TYPE, (unsigned long)client_type);
-        if (!ret) {
-            mpp_device_ioctl_version = 0;
-        } else {
-            ret = ioctl(dev, VPU_IOC_SET_CLIENT_TYPE_U32, (RK_U32)client_type);
-            if (!ret)
-                mpp_device_ioctl_version = 1;
-        }
-
-        if (ret)
-            mpp_err_f("can not find valid client type ioctl\n");
-
-        mpp_assert(ret == 0);
-    } else {
-        RK_U32 cmd = (mpp_device_ioctl_version == 0) ?
-                     (VPU_IOC_SET_CLIENT_TYPE) :
-                     (VPU_IOC_SET_CLIENT_TYPE_U32);
-
-        ret = ioctl(dev, cmd, client_type);
-    }
+    ret = ioctl(dev, cmd, (unsigned long)client_type);
 
     if (ret)
         mpp_err_f("set client type failed ret %d errno %d\n", ret, errno);
@@ -166,6 +134,7 @@ MPP_RET mpp_device_init(MppDevCtx *ctx, MppDevCfg *cfg)
             RK_S32 client_type = mpp_device_get_client_type(p, p->type, p->coding);
             RK_S32 ret = mpp_device_set_client_type(dev, client_type);
 
+            ret = ioctl(dev, VPU_IOC_SET_CLIENT_TYPE, client_type);
             if (ret) {
                 close(dev);
                 dev = -2;
@@ -206,7 +175,7 @@ MPP_RET mpp_device_deinit(MppDevCtx ctx)
 MPP_RET mpp_device_send_reg(MppDevCtx ctx, RK_U32 *regs, RK_U32 nregs)
 {
     MPP_RET ret;
-    MppReq req;
+    struct vpu_request req;
     MppDevCtxImpl *p;
 
     if (NULL == ctx || NULL == regs) {
@@ -247,7 +216,7 @@ MPP_RET mpp_device_send_reg(MppDevCtx ctx, RK_U32 *regs, RK_U32 nregs)
 MPP_RET mpp_device_wait_reg(MppDevCtx ctx, RK_U32 *regs, RK_U32 nregs)
 {
     MPP_RET ret;
-    MppReq req;
+    struct vpu_request req;
     MppDevCtxImpl *p;
 
     if (NULL == ctx || NULL == regs) {
