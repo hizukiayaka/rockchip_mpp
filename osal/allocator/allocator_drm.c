@@ -172,6 +172,14 @@ static int drm_alloc(int fd, size_t len, size_t align, RK_U32 *handle, RK_U32 fl
     return ret;
 }
 
+static int gem_close(int fd, RK_U32 handle)
+{
+    struct drm_gem_close data = {
+        .handle = handle,
+    };
+    return drm_ioctl(fd, DRM_IOCTL_GEM_CLOSE, &data);
+}
+
 static int drm_free(int fd, RK_U32 handle)
 {
     struct drm_mode_destroy_dumb data = {
@@ -273,6 +281,7 @@ static MPP_RET os_allocator_drm_import(void *ctx, MppBufferInfo *data)
     ret = drm_handle_to_fd(p->drm_device, (RK_U32)((intptr_t)data->hnd),
                            &data->fd, 0);
 
+    gem_close(p->drm_device, (RK_U32)((intptr_t)data->hnd));
     data->ptr = NULL;
     drm_dbg_func("leave dev %d\n", p->drm_device);
 
@@ -297,9 +306,11 @@ static MPP_RET os_allocator_drm_free(void *ctx, MppBufferInfo *data)
         drm_munmap(data->ptr, data->size);
         data->ptr = NULL;
     }
-    close(data->fd);
 
-    return drm_free(p->drm_device, (RK_U32)((intptr_t)data->hnd));
+    close(data->fd);
+    drm_free(p->drm_device, (RK_U32)((intptr_t)data->hnd));
+
+    return 0;
 }
 
 static MPP_RET os_allocator_drm_close(void *ctx)
