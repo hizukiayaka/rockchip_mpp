@@ -244,8 +244,6 @@ MPP_RET mpp_buffer_info_get_with_caller(MppBuffer buffer, MppBufferInfo *info, c
     }
 
     MppBufferImpl *p = (MppBufferImpl*)buffer;
-    if (NULL == p->info.ptr)
-        mpp_buffer_mmap(p, caller);
 
     *info = p->info;
     (void)caller;
