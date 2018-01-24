@@ -16,7 +16,6 @@
 
 #if defined(__gnu_linux__)
 #include "mpp_log.h"
-#include "mpp_runtime.h"
 
 #include "allocator_drm.h"
 #include "allocator_ext_dma.h"
@@ -36,23 +35,21 @@ MPP_RET os_allocator_get(os_allocator *api, MppBufferType type)
         *api = allocator_std;
     } break;
     case MPP_BUFFER_TYPE_ION : {
-        *api = (mpp_rt_allcator_is_valid(MPP_BUFFER_TYPE_ION)) ? allocator_ion :
-#if HAVE_DRM
-               (mpp_rt_allcator_is_valid(MPP_BUFFER_TYPE_DRM)) ? allocator_drm :
+#ifdef HAVE_DRM
+        *api = allocator_drm;
+#else
+        *api = allocator_ion;
 #endif
-               allocator_std;
     } break;
     case MPP_BUFFER_TYPE_EXT_DMA: {
         *api = allocator_ext_dma;
     } break;
     case MPP_BUFFER_TYPE_DRM : {
-#if HAVE_DRM
-        *api = (mpp_rt_allcator_is_valid(MPP_BUFFER_TYPE_DRM)) ? allocator_drm :
+#ifdef HAVE_DRM
+        *api = allocator_drm;
 #else
-        * api =
+        *api = allocator_std;
 #endif
-               (mpp_rt_allcator_is_valid(MPP_BUFFER_TYPE_ION)) ? allocator_ion :
-               allocator_std;
     } break;
     default : {
         ret = MPP_NOK;
